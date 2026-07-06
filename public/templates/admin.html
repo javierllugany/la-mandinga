@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración La Mandinga</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+        }
+        
+        .header .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+     </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>📦 Administración La Mandinga</h1>
+                <div class="subtitle">Panel de control - La Mandinga</div>
+            </div>
+            <a href="/" class="menu-item" target="_blank">
+                <i class="fas fa-boxes"></i>
+                <span>Inicio La Mandinga</span>
+            </a>
+        </div>
+        <div class="header">
+            <a href="/adminProductos" class="menu-item">
+                <i class="fas fa-boxes"></i>
+                <span>Productos de Proveedores</span>
+            </a>
+            <a href="/adminStock" class="menu-item">
+                <i class="fas fa-boxes"></i>
+                <span>Stock La Mandinga</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
