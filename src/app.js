@@ -4,7 +4,7 @@ const mysql = require('mysql2/promise');
 const path = require('path');
 const app = express();
 
-//const cors = require('cors');
+const cors = require('cors'); //anulado para DESARROLLO y activado para PRODUCCION
 //const helmet = require('helmet');
 const adminRoutes = require('./routes/adminRoutes');
 
@@ -18,6 +18,14 @@ const db = require('./config/database');
 // Middleware
 app.use(express.json());
 
+// estas 4 lineas de abajo activadas para PRODUCCION 
+//y desactivadas para DESARROLLO
+app.use(cors({
+	origin: 'http:localhost:3000', //el frontend
+	methods: ['GET','POST','PUT','DELETE'],
+	allowedHeaders: ['Content-Type', 'Autorization']
+}));
+
 // ============================================================
 // CONFIGURACIÓN DE LA BASE DE DATOS
 // ============================================================
@@ -29,13 +37,6 @@ const dbConfig = {
     database: process.env.DB_NAME,
     port: process.env.DB_PORT
 };
-
-console.log('📊 Configuración de DB:');
-console.log('  Host:', dbConfig.host);
-console.log('  User:', dbConfig.user);
-console.log('  Database:', dbConfig.database);
-console.log('  Password:', dbConfig.password ? '****' : 'vacío');
-
 
 // Rutas
 app.use('/api/admin', adminRoutes);
@@ -139,7 +140,6 @@ app.post('/api/admin/reload-products', async (req, res) => {
     console.log('🔄 Solicitando recarga de productos...');
     
     try {
-        // CORREGIDO: La ruta correcta desde backend/src/ es ../scripts/reloadProducts
         const scriptPath = path.join(__dirname, '../src/scripts/reloadProducts.js');
         console.log('📂 Cargando script desde:', scriptPath);
         
@@ -180,7 +180,6 @@ app.post('/api/admin/reload-products', async (req, res) => {
 // SERVIR ARCHIVOS ESTÁTICOS
 // ============================================================
 const frontendPath = path.join(__dirname, '../public');
-console.log('📂 Sirviendo archivos estáticos desde:', frontendPath);
 app.use(express.static(frontendPath));
 
 // ============================================================
@@ -218,9 +217,5 @@ app.listen(PORT, () => {
     console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
     console.log('='.repeat(50));
     console.log(`📱 Página principal: http://localhost:${PORT}/`);
-    console.log(`🔐 Panel admin: http://localhost:${PORT}/admin`);
-    console.log(`🔐 Panel adminProductos: http://localhost:${PORT}/adminProductos`);
-    console.log(`🧪 API test: http://localhost:${PORT}/api/test`);
-    console.log(`📊 API stats: http://localhost:${PORT}/api/admin/productos/stats`);
     console.log('='.repeat(50));
 });

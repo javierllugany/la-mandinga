@@ -1,5 +1,6 @@
 // Configuración
-const API_BASE_URL = 'http://localhost:3000/api';
+//const API_BASE_URL = 'http://localhost:3000/api'; //DESARROLLO
+const API_BASE_URL = 'http://iguanapop.net.ar/api'; //PRODUCCION
 
 // Elementos DOM
 const categoriasContainer = document.getElementById('categorias-container');
@@ -77,10 +78,16 @@ async function renderCategories() {
             categoriasContainer.innerHTML += `
                 <div class="category-card" data-category-id="${categoria.id}">
                     <div class="category-header" onclick="loadCategoryProducts(${categoria.id})">
-                        <img src="${categoria.image_url || '/assets/images/default-category.jpg'}" 
+                    	<!-- en DESARROLLO -->
+                        <!-- <img src="${categoria.image_url || '/images/default-category.jpg'}" -->
+                        <!-- en PRODUCCION -->
+                        <img src="${categoria.image_url || '/lamandinga/public/images/default-category.jpg'}"
                             alt="${categoria.nombre}" 
                             class="category-image"
-                            onerror="this.src='/assets/images/default-category.jpg'">
+                            <!-- en DESARROLLO -->
+                            <!-- onerror="this.src='/images/default-category.jpg'"> -->
+                            <!-- en PRODUCCION -->
+                            onerror="this.src='/lamandinga/public/images/default-category.jpg'; this.onerror=null;">
                         <div class="category-info">
                             <h2>${categoria.nombre}</h2>
                             <p>${categoria.descripcion || 'Productos naturales de alta calidad'}</p>
