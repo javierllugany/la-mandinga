@@ -131,6 +131,11 @@ main {
     color: #888;
 }
 
+.product-item .product-resaltado {
+    font-size: 0.90rem;
+    color: #a6880e;
+}
+
 .product-item .product-price {
     font-weight: 600;
     color: #2d5016;

@@ -1,6 +1,6 @@
 // Configuración
 //const API_BASE_URL = 'http://localhost:3000/api'; //DESARROLLO
-const API_BASE_URL = 'http://iguanapop.net.ar/api'; //PRODUCCION
+const API_BASE_URL = 'https://iguanapop.net.ar/api'; //PRODUCCION
 
 // Elementos DOM
 const categoriasContainer = document.getElementById('categorias-container');
@@ -79,14 +79,14 @@ async function renderCategories() {
                 <div class="category-card" data-category-id="${categoria.id}">
                     <div class="category-header" onclick="loadCategoryProducts(${categoria.id})">
                     	<!-- en DESARROLLO -->
-                        <!-- <img src="${categoria.image_url || '/images/default-category.jpg'}" -->
+                        <!-- <img src="../images/${categoria.image_url || '/images/default-category.jpg'}"
+                        alt="${categoria.nombre}" 
+                        class="category-image"
+                        onerror="this.src='/images/default-category.jpg'"> -->
                         <!-- en PRODUCCION -->
-                        <img src="${categoria.image_url || '/lamandinga/public/images/default-category.jpg'}"
+                        <img src="../images/${categoria.image_url || '/lamandinga/public/images/default-category.jpg'}"
                             alt="${categoria.nombre}" 
                             class="category-image"
-                            <!-- en DESARROLLO -->
-                            <!-- onerror="this.src='/images/default-category.jpg'"> -->
-                            <!-- en PRODUCCION -->
                             onerror="this.src='/lamandinga/public/images/default-category.jpg'; this.onerror=null;">
                         <div class="category-info">
                             <h2>${categoria.nombre}</h2>
@@ -108,8 +108,9 @@ async function renderCategories() {
                     <div class="product-item" data-product-id="${producto.id}">
                         <h3>${producto.producto}</h3>
                         <div class="product-origin">${producto.origen || 'Origen no especificado'}</div>
+                        <div class="product-resaltado">${producto.resaltado || ''}</div>
                         <div class="product-price">
-                            ${producto.precioVentaX100gr ? ` | $${producto.precioVentaX100gr} por 100g` : ''} 
+                            ${producto.precioVenta ? ` | $${producto.precioVenta} ${producto.unidad ? `${producto.unidad}` : ''}` : ''} 
                         </div>
                         <div class="stock-badge ${hasStock ? 'in-stock' : 'out-of-stock'}">
                             ${hasStock ? '✅ En stock' : '❌ Sin stock'}

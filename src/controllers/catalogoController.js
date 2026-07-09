@@ -43,7 +43,7 @@ const catalogoController = {
                         id,
                         producto,
                         stock,
-                        precioVentaX100gr,
+                        precioVenta,
                         origen,
                         categoria_id
                     FROM catalogo
@@ -61,7 +61,7 @@ const catalogoController = {
                         id: p.id,
                         producto: p.producto,
                         stock: p.stock,
-                        precioVentaX100gr: parseFloat(p.precioVentaX100gr),
+                        precioVenta: parseFloat(p.precioVenta),
                         origen: p.origen,
                         categoria_id: p.categoria_id,
                     }))
@@ -106,7 +106,7 @@ const catalogoController = {
                         id,
                         producto,
                         stock,
-                        precioVentaX100gr,
+                        precioVenta,
                         origen,
                         categoria_id
                     FROM catalogo
@@ -114,9 +114,6 @@ const catalogoController = {
                     ORDER BY producto`,
                     [categoria.id]
             );
-
-        //HASTA ACA LLEGUE#############################################################################
-
 
             res.json({
                 success: true,
@@ -126,7 +123,7 @@ const catalogoController = {
                         id: p.id,
                         producto: p.producto,
                         stock: p.stock,
-                        precioVentaX100gr: parseFloat(p.precioVentaX100gr),
+                        precioVenta: parseFloat(p.precioVenta),
                         origen: p.origen,
                         categoria_id: p.categoria_id,
                         creado_en: p.creado_en,
@@ -174,7 +171,7 @@ const catalogoController = {
                         id: p.id,
                         producto: p.producto,
                         stock: p.stock,
-                        precioVentaX100gr: parseFloat(p.precioVentaX100gr),
+                        precioVenta: parseFloat(p.precioVenta),
                         origen: p.origen,
                         categoria_id: p.categoria_id,
                         creado_en: p.creado_en,

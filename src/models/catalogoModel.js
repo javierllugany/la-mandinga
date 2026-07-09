@@ -8,9 +8,11 @@ const getAllProducts = async () => {
                 cat.id,
                 cat.producto,
                 cat.stock,
-                cat.precioVentaX100gr,
+                cat.precioVenta,
+                cat.unidad,
                 cat.origen,
-                cat.categoria_id 
+                cat.categoria_id, 
+                cat.resaltado
             FROM catalogo cat
             ORDER BY cat.producto
         `);

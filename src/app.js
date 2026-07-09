@@ -4,9 +4,11 @@ const mysql = require('mysql2/promise');
 const path = require('path');
 const app = express();
 
-const cors = require('cors'); //anulado para DESARROLLO y activado para PRODUCCION
+const cors = require('cors');
 //const helmet = require('helmet');
-const adminRoutes = require('./routes/adminRoutes');
+
+// anular en PRODUCCION y activar en DESARROLLO
+//const adminRoutes = require('./routes/adminRoutes');
 
 const productRoutes = require('./routes/productRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
@@ -18,8 +20,6 @@ const db = require('./config/database');
 // Middleware
 app.use(express.json());
 
-// estas 4 lineas de abajo activadas para PRODUCCION 
-//y desactivadas para DESARROLLO
 app.use(cors({
 	origin: 'http:localhost:3000', //el frontend
 	methods: ['GET','POST','PUT','DELETE'],
@@ -39,7 +39,9 @@ const dbConfig = {
 };
 
 // Rutas
-app.use('/api/admin', adminRoutes);
+// anular en PRODUCCION y activar en DESARROLLO
+//app.use('/api/admin', adminRoutes);
+
 app.use('/api/productos', productRoutes);
 app.use('/api/categorias', categoryRoutes);
 app.use('/api/catalogo', catalogoRoutes);
@@ -195,6 +197,10 @@ app.get('/admin', (req, res) => {
 
 app.get('/adminProductos', (req, res) => {
     res.sendFile(path.join(frontendPath, '/templates/adminProductos.html'));
+});
+
+app.get('/adminStock', (req, res) => {
+    res.sendFile(path.join(frontendPath, '/templates/adminStock.html'));
 });
 
 // ============================================================
