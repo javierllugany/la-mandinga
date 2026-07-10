@@ -142,6 +142,55 @@ const catalogoController = {
         }
     },
 
+    async searchCatalogo(req, res) {
+        try {
+            const { q } = req.query;
+            if (!q || q.trim() === '') {
+                return res.status(400).json({
+                    success: false,
+                    message: 'El parámetro de búsqueda "q" es obligatorio'
+                });
+            }
+
+            const [result] = await pool.query(
+                `SELECT 
+                    c.id,
+                    c.producto,
+                    c.stock,
+                    c.precioVenta,
+                    c.origen,
+                    c.categoria_id,
+                    cat.nombre AS categoria_name
+                FROM catalogo c
+                JOIN categorias cat ON c.categoria_id = cat.id
+                WHERE c.producto LIKE ? OR c.origen LIKE ?
+                ORDER BY c.producto`,
+                [`%${q}%`, `%${q}%`]
+            );
+
+            res.json({
+                success: true,
+                data: result.map(p => ({
+                    id: p.id,
+                    producto: p.producto,
+                    stock: p.stock,
+                    precioVenta: parseFloat(p.precioVenta),
+                    origen: p.origen,
+                    categoria_id: p.categoria_id,
+                    categoria_name: p.categoria_name
+                }))
+            });
+        } catch (error) {
+            console.error('Error al buscar productos en el catálogo:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error al realizar la búsqueda en el catálogo',
+                error: error.message,
+                stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            });
+        }
+    },
+
     // Obtener detalle de un producto específico
     async getCatalogoDetail(req, res) {
         try {

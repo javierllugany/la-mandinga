@@ -152,6 +152,52 @@ const productController = {
         }
     },
 
+    async searchProducts(req, res) {
+        try {
+            const { q } = req.query;
+
+            const [productos] = await pool.query(
+                `SELECT 
+                    id,
+                    producto,
+                    categoria_id,
+                    proveedor_id,
+                    precio_base,
+                    cantidad,
+                    origen,
+                    creado_en,
+                    actualizado_en
+                FROM productos
+                WHERE producto LIKE ?
+                ORDER BY nombre`,
+                [`%${q}%`]
+            );
+
+            res.json({
+                success: true,
+                data: productos.map(p => ({
+                    id: p.id,
+                    producto: p.producto,
+                    categoria_id: p.categoria_id,
+                    proveedor_id: p.proveedor_id,
+                    precio_base: parseFloat(p.precio_base),
+                    cantidad: parseInt(p.cantidad),
+                    origen: p.origen,
+                    creado_en: p.creado_en,
+                    actualizado_en: p.actualizado_en
+                }))
+            });
+        } catch (error) {
+            console.error('Error al buscar productos:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error al obtener datos',
+                error: error.message,
+                stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            });
+        }
+    },
+
     // Obtener detalle de un producto específico
     async getProductDetail(req, res) {
         try {

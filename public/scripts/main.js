@@ -78,16 +78,19 @@ async function renderCategories() {
             categoriasContainer.innerHTML += `
                 <div class="category-card" data-category-id="${categoria.id}">
                     <div class="category-header" onclick="loadCategoryProducts(${categoria.id})">
+
                     	<!-- en DESARROLLO -->
                         <!-- <img src="../images/${categoria.image_url || '/images/default-category.jpg'}"
                         alt="${categoria.nombre}" 
                         class="category-image"
                         onerror="this.src='/images/default-category.jpg'"> -->
+
                         <!-- en PRODUCCION -->
-                        <img src="../images/${categoria.image_url || '/lamandinga/public/images/default-category.jpg'}"
+                        <img src="/lamandinga/public/images/${categoria.image_url || '/lamandinga/public/images/default-category.jpg'}"
                             alt="${categoria.nombre}" 
                             class="category-image"
                             onerror="this.src='/lamandinga/public/images/default-category.jpg'; this.onerror=null;">
+                            
                         <div class="category-info">
                             <h2>${categoria.nombre}</h2>
                             <p>${categoria.descripcion || 'Productos naturales de alta calidad'}</p>
@@ -100,25 +103,63 @@ async function renderCategories() {
             `;
             const claveParaBuscar = clavesCategoria[i].toString();
             const productosContainer = document.getElementById('productos-' + categoria.id);
-            
+            let contadorStock = 0;
             for(j=0; j<resultado[claveParaBuscar].length; j++){
                 const producto = resultado[claveParaBuscar][j];
                 const hasStock = producto.stock > 0;
-                productosContainer.innerHTML+=`
-                    <div class="product-item" data-product-id="${producto.id}">
-                        <h3>${producto.producto}</h3>
-                        <div class="product-origin">${producto.origen || 'Origen no especificado'}</div>
-                        <div class="product-resaltado">${producto.resaltado || ''}</div>
-                        <div class="product-price">
-                            ${producto.precioVenta ? ` | $${producto.precioVenta} ${producto.unidad ? `${producto.unidad}` : ''}` : ''} 
-                        </div>
-                        <div class="stock-badge ${hasStock ? 'in-stock' : 'out-of-stock'}">
-                            ${hasStock ? '✅ En stock' : '❌ Sin stock'}
-                        </div>
-                    </div>
-                `;
+                    if (hasStock) {
+                        continue;
+                    } else {
+                        contadorStock++;
+                    }    
+                    if (contadorStock < 5) {
+                        continue;
+                    } else {
+                        break;
+                    }
             }
-
+            if (contadorStock === 5) {
+                for(j=0; j<resultado[claveParaBuscar].length; j++){
+                    const producto = resultado[claveParaBuscar][j];
+                    const hasStock = producto.stock > 0;
+                    if (!hasStock) {
+                        continue;
+                    }else{
+                        productosContainer.innerHTML+=`
+                            <div class="product-item" data-product-id="${producto.id}">
+                                <h3>${producto.producto}</h3>
+                                <div class="product-origin">${producto.origen || 'Origen no especificado'}</div>
+                                <div class="product-resaltado">${producto.resaltado || ''}</div>
+                                <div class="product-price">
+                                ${producto.precioVenta ? ` | $${producto.precioVenta} ${producto.unidad ? `${producto.unidad}` : ''}` : ''} 
+                                </div>
+                                ${producto.resaltado === 'encargar con anticipación' ? 'continue;' : 
+                                    '<div class="stock-badge in-stock">✅ En stock</div>'
+                                }
+                            </div>
+                            `;
+                    }
+                }
+            }else{
+                for(j=0; j<resultado[claveParaBuscar].length; j++){
+                    const producto = resultado[claveParaBuscar][j];
+                    const hasStock = producto.stock > 0;
+                    productosContainer.innerHTML+=`
+                        <div class="product-item" data-product-id="${producto.id}">
+                            <h3>${producto.producto}</h3>
+                            <div class="product-origin">${producto.origen || 'Origen no especificado'}</div>
+                            <div class="product-resaltado">${producto.resaltado || ''}</div>
+                            <div class="product-price">
+                                ${producto.precioVenta ? ` | $${producto.precioVenta} ${producto.unidad ? `${producto.unidad}` : ''}` : ''} 
+                            </div>
+                            ${producto.resaltado === 'encargar con anticipación' ? '' : 
+                                `<div class="stock-badge ${hasStock ? 'in-stock' : 'out-of-stock'}">
+                                    ${hasStock ? '✅ En stock' : '❌ Sin stock'}
+                                </div>`}
+                        </div>
+                    `;
+                }
+            }
         };
 
         // Agregar event listeners para los productos
@@ -184,7 +225,7 @@ window.loadProductDetail = async function(productId) {
             <h2>${product.nombre}</h2>
             <div class="detail-row">
                 <span class="detail-label">Categoría</span>
-                <span class="detail-value">${product.category_name || 'Sin categoría'}</span>
+                <span class="detail-value">${product.categoria_nombre || 'Sin categoría'}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Descripción</span>
@@ -227,6 +268,35 @@ window.addEventListener('click', function(event) {
     const modal = document.getElementById('product-modal');
     if (event.target === modal) {
         modal.style.display = 'none';
+    }
+});
+
+// NUEVO AGREGADO: 9jul2026
+
+// Toggle del menú mobile
+document.getElementById('menuToggle').addEventListener('click', function() {
+    const mobileMenu = document.getElementById('mobileMenu');
+    mobileMenu.classList.toggle('active');
+    
+    // Cambiar icono
+    const icon = this.querySelector('i');
+    if (mobileMenu.classList.contains('active')) {
+        icon.className = 'fas fa-times';
+    } else {
+        icon.className = 'fas fa-bars';
+    }
+});
+
+// Cerrar menú mobile al hacer clic fuera
+document.addEventListener('click', function(event) {
+    const mobileMenu = document.getElementById('mobileMenu');
+    const menuToggle = document.getElementById('menuToggle');
+    
+    if (mobileMenu.classList.contains('active') && 
+        !mobileMenu.contains(event.target) && 
+        !menuToggle.contains(event.target)) {
+        mobileMenu.classList.remove('active');
+        menuToggle.querySelector('i').className = 'fas fa-bars';
     }
 });
 

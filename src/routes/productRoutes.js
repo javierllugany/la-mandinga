@@ -12,4 +12,7 @@ router.get('/', productController.getProductos);
 // GET /api/productos/:productId - Obtener detalle de un producto
 router.get('/:productId', productController.getProductDetail);
 
+// GET /api/productos/search - Buscar productos
+router.get('/search', productController.searchProducts);
+
 module.exports = router;

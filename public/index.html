@@ -6,15 +6,91 @@
     <title>La Mandinga - Productos Saludables</title>
     <link rel="stylesheet" href="styles/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- HEADER CON MENÚ MEJORADO -->
     <header>
-        <div class="header-content">
-            <h1>🌿 La Mandinga</h1>
-            <p>Productos Saludables de Calidad</p>
+        <nav class="main-nav">
+            <div class="nav-container">
+                <!-- Logo y nombre -->
+                <div class="header-content">
+                    <h1>🌿 La Mandinga</h1>
+                    <p>Productos Saludables de Calidad</p>
+                </div>
+
+                <!-- Barra de búsqueda -->
+                <div class="search-container">
+                    <form class="search-form" id="searchForm">
+                        <input type="text" 
+                               class="search-input" 
+                               id="searchInput" 
+                               placeholder="Buscar productos..." 
+                               aria-label="Buscar productos">
+                        <button type="submit" class="search-button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Menú de navegación -->
+                <div class="nav-actions">
+                    <button class="nav-btn" id="cartBtn" aria-label="Carrito de compras">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="badge" id="cartBadge">0</span>
+                    </button>
+                    
+                    <button class="nav-btn" id="contactBtn" aria-label="Contacto">
+                        <i class="fas fa-envelope"></i>
+                        <span class="nav-label">Contacto</span>
+                    </button>
+                </div>
+
+                <!-- Menú hamburguesa (mobile) -->
+                <button class="menu-toggle" id="menuToggle" aria-label="Menú">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Menú mobile desplegable -->
+        <div class="mobile-menu" id="mobileMenu">
+            <div class="mobile-search">
+                <form class="search-form" id="mobileSearchForm">
+                    <input type="text" 
+                           class="search-input" 
+                           id="mobileSearchInput" 
+                           placeholder="Buscar productos..." 
+                           aria-label="Buscar productos">
+                    <button type="submit" class="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="mobile-actions">
+                <button class="mobile-nav-btn" id="mobileCartBtn">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Carrito</span>
+                    <span class="badge" id="mobileCartBadge">0</span>
+                </button>
+                <button class="mobile-nav-btn" id="mobileContactBtn">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contacto</span>
+                </button>
+            </div>
         </div>
     </header>
+    <!-- Para respuesta de búsqueda... -->
+    <main id="searchResults">
+        <section id="productosContainer-Search">
+            <div class="productos-list list-search" id="productosSearch">
+                <!-- Los productos se cargarán dinámicamente -->
+            </div>
+        </section>
+    </main>
 
+    <!-- RESTANTE DEL HTML... -->
     <main id="app">
         <section id="categorias-container">
             <!-- Las categorías se cargarán dinámicamente -->
@@ -31,11 +107,85 @@
         </div>
     </div>
 
+    <!-- Modal para el carrito -->
+    <div id="cart-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeCart">&times;</span>
+            <div id="cart-content">
+                <h2>🛒 Tu Carrito</h2>
+                <div id="cart-items">
+                    <!-- Items del carrito -->
+                </div>
+                <div class="cart-total">
+                    <strong>Total:</strong>
+                    <span id="cartTotal">$0.00</span>
+                </div>
+                <button class="checkout-btn" id="checkoutBtn">Finalizar Compra</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para contacto -->
+    <div id="contact-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeContact">&times;</span>
+            <div id="contact-content">
+                <h2>📧 Contacto</h2>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="contactName">Nombre</label>
+                        <input type="text" id="contactName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactEmail">Email</label>
+                        <input type="email" id="contactEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactMessage">Mensaje</label>
+                        <textarea id="contactMessage" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Enviar Mensaje</button>
+                </form>
+                <div class="contact-info">
+                    <p><i class="fas fa-phone"></i> +54 261 2523996</p>
+                    <p><i class="fas fa-whatsapp"></i> +54 9 261 2523996</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Ruta Prov. 89 12890 - Las Vegas - Potrerillos - Mendoza</p>
+                    <p><i class="fas fa-clock"></i> Sáb y Dom 10:00 - 18:00</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer>
-        <p>&copy; 2026 La Mandinga - Productos Saludables</p>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>🌿 La Mandinga</h4>
+                <p>Productos saludables de calidad para tu bienestar</p>
+            </div>
+            <div class="footer-section">
+                <h4>Contacto</h4>
+                <p>📞 +54 261 2523996</p>
+                <p>✉️ ojosdelplata@yahoo.com.ar</p>
+            </div>
+            <div class="footer-section">
+                <h4>Síguenos</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 La Mandinga - Productos Saludables</p>
+            <p><a href="https://iguanapop.net.ar/" target="_blank" rel="noopener noreferrer">powered by iguanapop</a></p>
+        </div>
     </footer>
 
     <script src="scripts/main.js"></script>
     <script src="scripts/productDetail.js"></script>
+    <script src="scripts/cart.js"></script>
+    <script src="scripts/contact.js"></script>
+    <script src="scripts/search.js"></script>
 </body>
 </html>
