@@ -3,6 +3,10 @@ class ShoppingCart {
     constructor() {
         this.items = JSON.parse(localStorage.getItem('cart')) || [];
         this.updateBadge();
+        // Ejecutar updateBadgeProducto después de 2 segundos
+        setTimeout(() => {
+            this.updateBadgeProducto();
+        }, 1000);
         this.setupEventListeners();
     }
 
@@ -21,7 +25,25 @@ class ShoppingCart {
         
         this.saveCart();
         this.updateBadge();
+        this.updateBadgeProducto(product.id);
         this.showNotification('Producto agregado al carrito');
+    }
+
+
+    // Actualizar cantidad
+    updateQuantity(productId, quantity) {
+        const item = this.items.find(item => item.id === productId);
+            if (item) {
+                if (quantity <= 0) {
+                    cart.removeItem(productId);
+                    return;
+                }
+                item.quantity = quantity;
+                this.saveCart();
+                this.updateBadge();
+                this.updateBadgeProducto(productId);
+                this.updateCartModal();
+            }
     }
 
     // Eliminar producto del carrito
@@ -29,29 +51,15 @@ class ShoppingCart {
         this.items = this.items.filter(item => item.id !== productId);
         this.saveCart();
         this.updateBadge();
+        this.updateBadgeProducto(productId);
         this.updateCartModal();
         this.showNotification('Producto eliminado del carrito');
-    }
-
-    // Actualizar cantidad
-    updateQuantity(productId, quantity) {
-        const item = this.items.find(item => item.id === productId);
-        if (item) {
-            if (quantity <= 0) {
-                this.removeItem(productId);
-                return;
-            }
-            item.quantity = quantity;
-            this.saveCart();
-            this.updateBadge();
-            this.updateCartModal();
-        }
     }
 
     // Calcular total
     getTotal() {
         return this.items.reduce((total, item) => {
-            const price = item.price_per_100g || item.price_per_kg || 0;
+            const price = item.precio || 0;
             return total + (price * item.quantity);
         }, 0);
     }
@@ -61,7 +69,7 @@ class ShoppingCart {
         localStorage.setItem('cart', JSON.stringify(this.items));
     }
 
-    // Actualizar badge del carrito
+    // Actualizar el carrito del menu
     updateBadge() {
         const totalItems = this.items.reduce((sum, item) => sum + item.quantity, 0);
         const badges = document.querySelectorAll('#cartBadge, #mobileCartBadge');
@@ -69,6 +77,49 @@ class ShoppingCart {
             badge.textContent = totalItems;
             badge.style.display = totalItems > 0 ? 'block' : 'none';
         });
+    }
+
+    // actualizar el carrito del producto y del producto de busqueda
+    updateBadgeProducto(id, compra) {
+        if (id) {
+            const itemProducto = this.items.find(item => item.id === id);
+            const badgeProducto = document.getElementById(`badge-${id}`);
+            const badgeProductoSearch = document.getElementById(`badge-search-${id}`);
+            if(itemProducto){
+                badgeProducto.textContent = itemProducto.quantity;
+            }else{
+                badgeProducto.textContent = 0;
+            }
+            badgeProducto.style.display = badgeProducto.textContent > 0 ? 'block' : 'none';
+            if(badgeProductoSearch){
+                if(itemProducto){
+                    badgeProductoSearch.textContent = itemProducto.quantity;
+                }else{
+                    badgeProductoSearch.textContent = 0;
+                }
+                badgeProductoSearch.style.display = badgeProducto.textContent > 0 ? 'block' : 'none';
+            }
+        }else{
+            let itemTemp = this.items;
+            itemTemp.forEach((item) => {
+                const badgeProductoDeCatalogo = document.getElementById(`badge-${item.id}`);
+                const badgeProductoDeSearch = document.getElementById(`badge-search-${item.id}`);
+                if(compra){
+                    badgeProductoDeCatalogo.textContent = 0;
+                }else{
+                    badgeProductoDeCatalogo.textContent = item.quantity;
+                }
+                if(badgeProductoDeSearch){
+                    if(compra){
+                        badgeProductoDeSearch.textContent = 0;
+                    }else{
+                        badgeProductoDeSearch.textContent = item.quantity;
+                    }
+                    badgeProductoDeSearch.style.display = badgeProductoDeSearch.textContent > 0 ? 'block' : 'none';
+                }
+                badgeProductoDeCatalogo.style.display = badgeProductoDeCatalogo.textContent > 0 ? 'block' : 'none';
+            });
+        }
     }
 
     // Mostrar modal del carrito
@@ -87,7 +138,7 @@ class ShoppingCart {
             cartItems.innerHTML = `
                 <div class="empty-cart">
                     <p>🛒 Tu carrito está vacío</p>
-                    <p style="color: #999; font-size: 0.9rem;">¡Explora nuestros productos saludables!</p>
+                    <p style="color: #2c3e50; font-size: 0.9rem;">¡Explora nuestros productos saludables!</p>
                 </div>
             `;
             cartTotal.textContent = '$0.00';
@@ -98,13 +149,13 @@ class ShoppingCart {
             <div class="cart-item" data-id="${item.id}">
                 <div class="cart-item-info">
                     <div class="cart-item-name">${item.name}</div>
-                    <div class="cart-item-price">$${(item.price_per_100g || item.price_per_kg || 0).toFixed(2)}</div>
+                    <div class="cart-item-price">$${item.precioYunidad}</div>
                 </div>
                 <div class="cart-item-actions">
-                    <button onclick="cart.updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                    <button class="botonMenosCarrito" data-id="${item.id}" data-quantity="${item.quantity - 1}">-</button>
                     <span>${item.quantity}</span>
-                    <button onclick="cart.updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
-                    <button onclick="cart.removeItem(${item.id})" class="remove-item">
+                    <button class="botonMasCarrito" data-id="${item.id}" data-quantity="${item.quantity + 1}">+</button>
+                    <button data-id="${item.id}" class="remove-item">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -124,6 +175,12 @@ class ShoppingCart {
         setTimeout(() => {
             notification.remove();
         }, 3000);
+    }
+
+    //ESCRIBIR LOGICA DE LA COMPRA... Envia whatsapp con lista
+    gestionarPedido(items){
+        console.log('Pedido Confirmado');
+        return true;
     }
 
     // Configurar event listeners
@@ -146,12 +203,50 @@ class ShoppingCart {
                 this.showNotification('El carrito está vacío', true);
                 return;
             }
-            this.showNotification('¡Compra finalizada! Gracias por tu pedido');
-            this.items = [];
-            this.saveCart();
-            this.updateBadge();
-            this.updateCartModal();
-            document.getElementById('cart-modal').style.display = 'none';
+            let confirmacionCompra = false;
+            confirmacionCompra = this.gestionarPedido(this.items);
+            if(confirmacionCompra){
+                this.updateBadgeProducto(false, true);
+                this.showNotification('¡Tu pedido ha sido gestionado! Pronto recibirás más info por Whatsapp. Muchas Gracias!');
+                this.items = [];
+                this.saveCart();
+                this.updateBadge();
+                this.updateCartModal();
+                document.getElementById('cart-modal').style.display = 'none';
+            }else{
+                this.showNotification('¡Tu pedido no ha sido gestionado. Aún puedes agregar o quitar productos del carrito, cancelar el pedido o confirmarlo. Muchas Gracias!');
+            }
+        });
+
+        // Configuración de event delegation para botones dinámicos
+        document.addEventListener('DOMContentLoaded', function() {
+            // Suponiendo que tus botones tienen una clase específica
+            document.addEventListener('click', function(e) {
+                // Buscar si el click fue en un botón con clase 'btn-arte'
+                const button = e.target.closest('.botonMenosCarrito');
+                const button2 = e.target.closest('.botonMasCarrito');
+                let boton;
+                if (button) {
+                    boton=button;
+                }else if(button2){
+                    boton=button2
+                }
+                if (boton) {
+                    // Obtener parámetros desde data-attributes
+                    const param1 = Number(boton.dataset.id);
+                    const param2 = Number(boton.dataset.quantity);
+                    cart.updateQuantity(param1, param2);
+                }
+                const buttonDel = e.target.closest('.remove-item');
+                if (buttonDel) {
+                    const param1 = Number(buttonDel.dataset.id);
+                    
+                    // Llamar a la función arte con los parámetros
+                    if (param1) {
+                        cart.removeItem(param1);
+                    }
+                }
+            });
         });
     }
 }
@@ -164,15 +259,16 @@ window.addToCart = function(productId) {
     // Obtener producto de la base de datos o del DOM
     const productElement = document.querySelector(`.product-item[data-product-id="${productId}"]`);
     if (productElement) {
-        const name = productElement.querySelector('h3').textContent;
-        const priceText = productElement.querySelector('.product-price').textContent;
-        const price = parseFloat(priceText.match(/\d+\.?\d*/)[0]) || 0;
+        const producto = productElement.querySelector('h3').textContent;
+        const precioYunidadConInicio = productElement.querySelector('.product-price').textContent;
+        const precioYunidad = precioYunidadConInicio.replace(/\|\s\$/g, "");
+        const precio = parseFloat(precioYunidad.match(/\d+\.?\d*/)[0]) || 0;
         
         cart.addItem({
             id: productId,
-            name: name,
-            price_per_100g: price,
-            price_per_kg: price * 9
+            name: producto,
+            precioYunidad: precioYunidad,
+            precio: precio
         });
     }
 };
@@ -187,8 +283,8 @@ window.loadProductDetail = async function(productId) {
         <button onclick="cart.addItem({
             id: ${product.id},
             name: '${product.name}',
-            price_per_100g: ${product.price_per_100g || 0},
-            price_per_kg: ${product.price_per_kg || 0}
+            precioYunidad: ${product.precioYunidad || 0},
+            precio: ${product.precio || 0}
         })" class="add-to-cart-btn">
             <i class="fas fa-shopping-cart"></i> Agregar al Carrito
         </button>

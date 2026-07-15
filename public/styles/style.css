@@ -3,8 +3,15 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+a{
     text-decoration: none;
     color: white;
+}
+
+input, select, textarea {
+    color: black;
 }
 
 body {
@@ -21,6 +28,10 @@ header {
     position: sticky;
     top: 0;
     z-index: 1000;
+}
+
+.header-content{
+    color: white;
 }
 
 .main-nav {
@@ -203,11 +214,10 @@ main {
 
 .product-item {
     background: #faf8f4;
-    padding: 1.2rem;
     border-radius: 12px;
     transition: all 0.3s ease;
-    cursor: pointer;
     border: 1px solid #e8e4dc;
+    display: grid;
 }
 
 .product-item:hover {
@@ -220,31 +230,71 @@ main {
     font-size: 1.1rem;
     color: #2c3e50;
     margin-bottom: 0.3rem;
+    margin-top: 1rem;
+    margin-left: 1rem;
 }
 
 .product-item .product-origin {
     font-size: 0.85rem;
     color: #888;
+    margin-left: 1rem;
 }
 
 .product-item .product-resaltado {
     font-size: 0.90rem;
     color: #a6880e;
+    margin-left: 1rem;
 }
 
 .product-item .product-price {
     font-weight: 600;
     color: #2d5016;
     margin-top: 0.5rem;
+    margin-left: 1rem;
 }
 
 .stock-badge {
-    display: inline-block;
     padding: 0.2rem 0.8rem;
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 600;
     margin-top: 0.5rem;
+    margin-right: 10px;
+    width: fit-content;
+    margin-bottom: 1rem;
+    margin-left: 1rem;
+}
+
+.producto-badge, .search-badge {
+    display: none;
+}
+
+.nav-btnProducto {
+    padding: 0.6rem 1.2rem;
+    background: rgba(217, 207, 189, 0.6);
+    border: 1px solid rgba(157, 157, 157, 0.2);
+    border-radius: 50px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    position: absolute;
+    font-family: 'Inter', sans-serif;
+    width: fit-content;
+    justify-self: end;
+    align-self: end;
+    margin-bottom: 1rem;
+    margin-right: 1rem;
+}
+
+.nav-btnProducto i{
+    color: black;
+}
+
+.nav-btnProducto:hover {
+    background: rgba(157, 157, 157, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .in-stock {
@@ -252,7 +302,7 @@ main {
     color: #155724;
 }
 
-.out-of-stock {
+.out-stock {
     background: #f8d7da;
     color: #721c24;
 }
@@ -275,7 +325,7 @@ main {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: white;
+    background: #7ec8bdd4;
     padding: 2.5rem;
     border-radius: 20px;
     max-width: 600px;
@@ -291,7 +341,7 @@ main {
     right: 1.5rem;
     font-size: 2rem;
     cursor: pointer;
-    color: #999;
+    color: #5e5e5e;
     transition: color 0.2s ease;
 }
 
@@ -608,7 +658,7 @@ footer {
     display: block;
     margin-bottom: 0.3rem;
     font-weight: 600;
-    color: #2c3e50;
+    color: white;
 }
 
 .form-group input,
@@ -661,6 +711,7 @@ footer {
 
 @media (max-width: 768px) {
     .search-container {
+        display: none;
         order: 3;
         flex-basis: 100%;
         max-width: 100%;

@@ -73,6 +73,7 @@ class SearchHandler {
         // Filtrar categorías para mostrar solo las que tienen resultados
         const categoriesMap = new Map();
         
+        //products.forEach(product => this.createProductItem(product)) 
         products.forEach(product => this.createProductItem(product)) 
     }
 
@@ -81,31 +82,19 @@ class SearchHandler {
         if (!hasStock) {
             return; // No renderizar productos sin stock
         }else{
-            productosContainerSearch.innerHTML+=`
-                <div class="product-item" data-product-id="${producto.id}">
-                    <h3>${producto.producto}</h3>
-                    <div class="product-origin">${producto.origen || 'Origen no especificado'}</div>
-                    <div class="product-resaltado">${producto.resaltado || ''}</div>
-                    <div class="product-price">
-                    ${producto.precioVenta ? ` | $${producto.precioVenta} ${producto.unidad ? `${producto.unidad}` : ''}` : ''} 
-                    </div>
-                    ${producto.resaltado === 'encargar con anticipación' ? 'continue;' : 
-                        '<div class="stock-badge in-stock">✅ En stock</div>'
-                    }
-                </div>
-            `;
+            let search=true;
+            cargarDOMProductos(productosContainerSearch, producto, hasStock, search);  //funcion en main.js
         }
     }
+
+    //ARREGLAR: EL PRODUCTO EN SEARCH SE AGREGA AL CARRITO PERO SE PIERDE SI SE REFRESH Y NO SE REPLICA EN EL PRODUCTO POR CATEGORIA
 
     displayNoResults(query) {
         const categoriesContainer = document.getElementById('categorias-container');
         categoriesContainer.innerHTML = `
             <div class="no-results">
                 <p>🔍 No se encontraron productos para "${query}"</p>
-                <p style="color: #999; font-size: 0.9rem;">Intenta con otras palabras o revisa todas nuestras categorías</p>
-                <button onclick="renderCategories()" class="reset-search-btn">
-                    Ver todos los productos
-                </button>
+                <p style="color: #999; font-size: 0.9rem;">Intenta con otras palabras</p>
             </div>
         `;
     }

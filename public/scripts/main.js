@@ -1,6 +1,6 @@
 // Configuración
-//const API_BASE_URL = 'http://localhost:3000/api'; //DESARROLLO
-const API_BASE_URL = 'https://iguanapop.net.ar/api'; //PRODUCCION
+const API_BASE_URL = 'http://localhost:3000/api'; //DESARROLLO
+//const API_BASE_URL = 'https://iguanapop.net.ar/api'; //PRODUCCION
 
 // Elementos DOM
 const categoriasContainer = document.getElementById('categorias-container');
@@ -67,112 +67,6 @@ async function renderCategories() {
             `;
             return;
         }
-            
-        const resultado = asignarProductosACategoria(listaCatalogo, listaCategorias);
-        console.log('Resultado de verificación de categorías con productos:', resultado);
-
-        const clavesCategoria = Object.keys(resultado).map(Number);
-
-        for(i=0; i<clavesCategoria.length; i++){
-            const categoria = listaCategorias.find(c => c.id === clavesCategoria[i]);
-            categoriasContainer.innerHTML += `
-                <div class="category-card" data-category-id="${categoria.id}">
-                    <div class="category-header" onclick="loadCategoryProducts(${categoria.id})">
-
-                    	<!-- en DESARROLLO -->
-                        <!-- <img src="../images/${categoria.image_url || '/images/default-category.jpg'}"
-                        alt="${categoria.nombre}" 
-                        class="category-image"
-                        onerror="this.src='/images/default-category.jpg'"> -->
-
-                        <!-- en PRODUCCION -->
-                        <img src="/lamandinga/public/images/${categoria.image_url || '/lamandinga/public/images/default-category.jpg'}"
-                            alt="${categoria.nombre}" 
-                            class="category-image"
-                            onerror="this.src='/lamandinga/public/images/default-category.jpg'; this.onerror=null;">
-                            
-                        <div class="category-info">
-                            <h2>${categoria.nombre}</h2>
-                            <p>${categoria.descripcion || 'Productos naturales de alta calidad'}</p>
-                        </div>
-                        <div class="category-icon">▶</div>
-                    </div>
-                    <div class="productos-list" id="productos-${categoria.id}">
-                    </div>
-                </div>
-            `;
-            const claveParaBuscar = clavesCategoria[i].toString();
-            const productosContainer = document.getElementById('productos-' + categoria.id);
-            let contadorStock = 0;
-            for(j=0; j<resultado[claveParaBuscar].length; j++){
-                const producto = resultado[claveParaBuscar][j];
-                const hasStock = producto.stock > 0;
-                    if (hasStock) {
-                        continue;
-                    } else {
-                        contadorStock++;
-                    }    
-                    if (contadorStock < 5) {
-                        continue;
-                    } else {
-                        break;
-                    }
-            }
-            if (contadorStock === 5) {
-                for(j=0; j<resultado[claveParaBuscar].length; j++){
-                    const producto = resultado[claveParaBuscar][j];
-                    const hasStock = producto.stock > 0;
-                    if (!hasStock) {
-                        continue;
-                    }else{
-                        productosContainer.innerHTML+=`
-                            <div class="product-item" data-product-id="${producto.id}">
-                                <h3>${producto.producto}</h3>
-                                <div class="product-origin">${producto.origen || 'Origen no especificado'}</div>
-                                <div class="product-resaltado">${producto.resaltado || ''}</div>
-                                <div class="product-price">
-                                ${producto.precioVenta ? ` | $${producto.precioVenta} ${producto.unidad ? `${producto.unidad}` : ''}` : ''} 
-                                </div>
-                                ${producto.resaltado === 'encargar con anticipación' ? 'continue;' : 
-                                    '<div class="stock-badge in-stock">✅ En stock</div>'
-                                }
-                            </div>
-                            `;
-                    }
-                }
-            }else{
-                for(j=0; j<resultado[claveParaBuscar].length; j++){
-                    const producto = resultado[claveParaBuscar][j];
-                    const hasStock = producto.stock > 0;
-                    productosContainer.innerHTML+=`
-                        <div class="product-item" data-product-id="${producto.id}">
-                            <h3>${producto.producto}</h3>
-                            <div class="product-origin">${producto.origen || 'Origen no especificado'}</div>
-                            <div class="product-resaltado">${producto.resaltado || ''}</div>
-                            <div class="product-price">
-                                ${producto.precioVenta ? ` | $${producto.precioVenta} ${producto.unidad ? `${producto.unidad}` : ''}` : ''} 
-                            </div>
-                            ${producto.resaltado === 'encargar con anticipación' ? '' : 
-                                `<div class="stock-badge ${hasStock ? 'in-stock' : 'out-of-stock'}">
-                                    ${hasStock ? '✅ En stock' : '❌ Sin stock'}
-                                </div>`}
-                        </div>
-                    `;
-                }
-            }
-        };
-
-        // Agregar event listeners para los productos
-        document.querySelectorAll('.product-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const productId = this.dataset.productId;
-                if (productId) {
-                    loadProductDetail(productId);
-                }
-            });
-        });
-
     } catch (error) {
         console.error('Error rendering categorias:', error);
         categoriasContainer.innerHTML = `
@@ -181,10 +75,119 @@ async function renderCategories() {
             </div>
         `;
     }
+    cargarDOMCategories();
+}
+    
+
+
+
+
+// Cargar en DOM categorías y sus productos
+async function cargarDOMCategories() {
+            
+    const resultado = asignarProductosACategoria(listaCatalogo, listaCategorias);
+    console.log('Resultado de verificación de categorías con productos:', resultado);
+
+    const clavesCategoria = Object.keys(resultado).map(Number);
+
+    for(let i=0; i<clavesCategoria.length; i++){
+        const categoria = listaCategorias.find(c => c.id === clavesCategoria[i]);
+        categoriasContainer.innerHTML += `
+            <div class="category-card" data-category-id="${categoria.id}">
+                <div class="category-header" onclick="loadCategoryProducts(${categoria.id})">
+
+                    <!-- en DESARROLLO -->
+                    <img src="../images/categorias/${categoria.image_url || '/images/categorias/default-category.jpg'}"
+                    alt="${categoria.nombre}" 
+                    class="category-image"
+                    onerror="this.src='/images/categorias/default-category.jpg'">
+
+                    <!-- en PRODUCCION -->
+                    <!-- <img src="/lamandinga/public/images/categorias/${categoria.image_url || '/lamandinga/public/images/categorias/default-category.jpg'}"
+                        alt="${categoria.nombre}" 
+                        class="category-image"
+                        onerror="this.src='/lamandinga/public/images/categorias/default-category.jpg'; this.onerror=null;"> -->
+                        
+                    <div class="category-info">
+                        <h2>${categoria.nombre}</h2>
+                        <p>${categoria.descripcion || 'Productos naturales de alta calidad'}</p>
+                    </div>
+                    <div class="category-icon">▶</div>
+                </div>
+                <div class="productos-list" id="productos-${categoria.id}">
+                </div>
+            </div>
+        `;
+        const claveParaBuscar = clavesCategoria[i].toString();
+        const productosContainer = document.getElementById('productos-' + categoria.id);
+        let contadorProductosSinStock = 0;
+        for(let j=0; j<resultado[claveParaBuscar].length; j++){
+            const producto = resultado[claveParaBuscar][j];
+            const hasStock = producto.stock > 0;
+                if (hasStock) {
+                    continue;
+                } else {
+                    contadorProductosSinStock++;
+                }    
+                if (contadorProductosSinStock < 5) {
+                    continue;
+                } else {
+                    break;
+                }
+        }
+        if (contadorProductosSinStock === 5) {
+            for(let j=0; j<resultado[claveParaBuscar].length; j++){
+                const producto = resultado[claveParaBuscar][j];
+                const hasStock = producto.stock > 0;
+                if (!hasStock) {
+                    continue;
+                }else{
+                    cargarDOMProductos(productosContainer, producto, hasStock);
+                }
+            }
+        }else{
+            for(let j=0; j<resultado[claveParaBuscar].length; j++){
+                const producto = resultado[claveParaBuscar][j];
+                const hasStock = producto.stock > 0;
+                if (!hasStock) {
+                    cargarDOMProductos(productosContainer, producto, hasStock);
+                }else{;
+                    cargarDOMProductos(productosContainer, producto, hasStock);
+                }
+                if (producto.categoria_id === 14 || producto.categoria_id === 15 || producto.categoria_id === 16 || producto.categoria_id === 17 || producto.categoria_id === 18 || producto.categoria_id === 19 || producto.categoria_id === 20) {
+                    const esteDiv = document.querySelector(`div[data-product-id="${producto.id}"]`);
+                    esteDiv.classList.add("verDetalle");
+                }
+            }
+        }
+    }
+};
+
+function cargarDOMProductos(contenedor, producto, stock, search) {
+    contenedor.innerHTML+=`
+        <div class="product-item" data-product-id="${producto.id}">
+            <h3>${producto.producto}</h3>
+            <div class="product-origin">${producto.origen || 'Origen no especificado'}</div>
+            <div class="product-resaltado">${producto.resaltado || ''}</div>
+            <div class="product-price">
+            ${producto.precioVenta ? ` | $${producto.precioVenta} ${producto.unidad ? `${producto.unidad}` : ''}` : ''} 
+            </div>
+            ${producto.resaltado === 'encargar con anticipación' ? 'continue;' : 
+                ` ${stock ? '<div class="stock-badge in-stock">✅ En stock</div>' : '<div class="stock-badge out-stock">❌ Sin stock</div>'}`
+            }
+            ${stock ? ` <button class='nav-btnProducto' id='cartBtn-producto-${producto.id}' onclick='addToCart(${producto.id})' aria-label='Agregar al Carrito'>
+                <i class='fas fa-solid fa-cart-plus'></i>
+                ${search ? `<span class='badge search-badge' id='badge-search-${producto.id}'>0</span></button>` : ` <span class='badge producto-badge' id='badge-${producto.id}'>0</span></button> ` } ` : `` } 
+        </div>
+        `;
+    if(search){
+        // Llamamos a la función que está en cart.js usando el objeto cart creado en cart.js
+        cart.updateBadgeProducto();
+    }
 }
 
 function asignarProductosACategoria(listaCatalogo, listaCategorias) {
-    // Crear un Map con los IDs de categorías
+    // Crear un Map con los IDs de categorías    
     const resultadoMap = new Map();
 
     listaCategorias.forEach(categoria => {
