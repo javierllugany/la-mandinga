@@ -1,6 +1,6 @@
 // Configuración
-const API_BASE_URL = 'http://localhost:3000/api'; //DESARROLLO
-//const API_BASE_URL = 'https://iguanapop.net.ar/api'; //PRODUCCION
+//const API_BASE_URL = 'http://localhost:3000/api'; //DESARROLLO
+const API_BASE_URL = 'https://iguanapop.net.ar/api'; //PRODUCCION
 
 // Elementos DOM
 const categoriasContainer = document.getElementById('categorias-container');
@@ -97,16 +97,16 @@ async function cargarDOMCategories() {
                 <div class="category-header" onclick="loadCategoryProducts(${categoria.id})">
 
                     <!-- en DESARROLLO -->
-                    <img src="../images/categorias/${categoria.image_url || '/images/categorias/default-category.jpg'}"
+                    <!-- <img src="../images/categorias/${categoria.image_url || '/images/categorias/default-category.jpg'}"
                     alt="${categoria.nombre}" 
                     class="category-image"
-                    onerror="this.src='/images/categorias/default-category.jpg'">
+                    onerror="this.src='/images/categorias/default-category.jpg'"> -->
 
                     <!-- en PRODUCCION -->
-                    <!-- <img src="/lamandinga/public/images/categorias/${categoria.image_url || '/lamandinga/public/images/categorias/default-category.jpg'}"
+                    <img src="/lamandinga/public/images/categorias/${categoria.image_url || '/lamandinga/public/images/categorias/default-category.jpg'}"
                         alt="${categoria.nombre}" 
                         class="category-image"
-                        onerror="this.src='/lamandinga/public/images/categorias/default-category.jpg'; this.onerror=null;"> -->
+                        onerror="this.src='/lamandinga/public/images/categorias/default-category.jpg'; this.onerror=null;">
                         
                     <div class="category-info">
                         <h2>${categoria.nombre}</h2>

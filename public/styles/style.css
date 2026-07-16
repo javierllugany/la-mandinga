@@ -377,6 +377,113 @@ main {
     font-weight: 700;
 }
 
+/* Radio buttons personalizados */
+.radio-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border: 2px solid #e8e4dc;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.radio-option:hover {
+    border-color: #4a7c2e;
+    background: #f8f6f0;
+}
+
+.radio-option input[type="radio"] {
+    display: none;
+}
+
+.radio-option input[type="radio"]:checked + .radio-label {
+    color: #2d5016;
+    font-weight: 600;
+}
+
+.radio-option:has(input[type="radio"]:checked) {
+    border-color: #4a7c2e;
+    background: #e8f5e9;
+    box-shadow: 0 2px 8px rgba(74, 124, 46, 0.2);
+}
+
+.radio-label {
+    font-size: 0.95rem;
+    color: #2c3e50;
+}
+
+.help-text {
+    display: block;
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 0.3rem;
+}
+
+.info-box {
+    background: #e3f2fd;
+    border-left: 4px solid #2196F3;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 0.5rem 0;
+}
+
+.info-box i {
+    color: #2196F3;
+    margin-right: 0.5rem;
+}
+
+.info-box p {
+    margin: 0.3rem 0;
+    color: #2c3e50;
+}
+
+/* Animación de carga para el botón */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin: -10px 0 0 -10px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive para radios */
+@media (max-width: 600px) {
+    .radio-group {
+        flex-direction: column;
+    }
+    
+    .radio-option {
+        justify-content: flex-start;
+    }
+}
+
 /* Footer */
 footer {
     background: #2c3e50;
@@ -421,6 +528,255 @@ footer {
     text-align: center;
     font-size: 0.9rem;
     opacity: 0.8;
+}
+
+/* Modal de Checkout */
+.checkout-content {
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.checkout-content .form-group {
+    margin-bottom: 1.2rem;
+}
+
+.checkout-content label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.checkout-content input,
+.checkout-content textarea,
+.checkout-content select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #e8e4dc;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.checkout-content input:focus,
+.checkout-content textarea:focus,
+.checkout-content select:focus {
+    outline: none;
+    border-color: #4a7c2e;
+}
+
+.order-summary {
+    background: #f8f6f0;
+    padding: 1.2rem;
+    border-radius: 8px;
+    margin: 1.2rem 0;
+}
+
+.order-summary h4 {
+    margin-bottom: 0.8rem;
+    color: #2d5016;
+}
+
+.checkout-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e8e4dc;
+}
+
+.checkout-item:last-child {
+    border-bottom: none;
+}
+
+.order-total {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 0.8rem;
+    margin-top: 0.8rem;
+    border-top: 2px solid #4a7c2e;
+    font-size: 1.2rem;
+}
+
+.order-total span {
+    color: #2d5016;
+    font-weight: 700;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+/* Modal de Confirmación */
+.confirmation-content {
+    max-width: 500px;
+    text-align: center;
+}
+
+.confirmation-header {
+    margin-bottom: 1.5rem;
+}
+
+.confirmation-icon {
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+}
+
+.confirmation-header h2 {
+    color: #2d5016;
+    margin-bottom: 0.3rem;
+}
+
+.confirmation-header p {
+    color: #666;
+}
+
+#order-confirmation-details {
+    text-align: left;
+    background: #f8f6f0;
+    padding: 1.2rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.confirmation-order-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e8e4dc;
+}
+
+.order-number {
+    font-weight: 700;
+    color: #2d5016;
+    font-size: 1.1rem;
+}
+
+.order-date {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.confirmation-customer {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e8e4dc;
+}
+
+.confirmation-customer p {
+    margin: 0.3rem 0;
+}
+
+.confirmation-items {
+    margin: 0.8rem 0;
+}
+
+.confirmation-items h4 {
+    margin-bottom: 0.5rem;
+    color: #2d5016;
+}
+
+.confirmation-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid #e8e4dc;
+}
+
+.confirmation-total {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 0.8rem;
+    margin-top: 0.8rem;
+    border-top: 2px solid #4a7c2e;
+    font-size: 1.2rem;
+}
+
+.confirmation-total span {
+    color: #2d5016;
+    font-weight: 700;
+}
+
+.confirmation-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.confirmation-actions .btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.8rem 1.2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.confirmation-actions .btn-success {
+    background: #25D366;
+    color: white;
+}
+
+.confirmation-actions .btn-success:hover {
+    background: #1da851;
+    transform: translateY(-2px);
+}
+
+.confirmation-actions .btn-primary {
+    background: #4a7c2e;
+    color: white;
+}
+
+.confirmation-actions .btn-primary:hover {
+    background: #2d5016;
+    transform: translateY(-2px);
+}
+
+.confirmation-actions .btn-secondary {
+    background: #e8e4dc;
+    color: #2c3e50;
+}
+
+.confirmation-actions .btn-secondary:hover {
+    background: #ddd6c9;
+    transform: translateY(-2px);
+}
+
+/* Responsive para modales */
+@media (max-width: 768px) {
+    .checkout-content,
+    .confirmation-content {
+        width: 95%;
+        padding: 1.2rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .confirmation-actions {
+        flex-direction: column;
+    }
+
+    .confirmation-actions .btn {
+        width: 100%;
+    }
+
+    .confirmation-order-info {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.3rem;
+    }
 }
 
 /* Responsive */

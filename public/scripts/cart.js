@@ -8,6 +8,7 @@ class ShoppingCart {
             this.updateBadgeProducto();
         }, 1000);
         this.setupEventListeners();
+        this.setupCheckoutListeners(); // Nuevo método
     }
 
     // Agregar producto al carrito
@@ -62,6 +63,690 @@ class ShoppingCart {
             const price = item.precio || 0;
             return total + (price * item.quantity);
         }, 0);
+    }
+
+    // Obtener resumen del pedido para mostrar
+    getOrderSummary() {
+        return this.items.map(item => ({
+            nombre: item.name,
+            cantidad: item.quantity,
+            precioUnitario: item.precio,
+            subtotal: item.precio * item.quantity,
+            precioYunidad: item.precioYunidad || `$${item.precio}`
+        }));
+    }
+
+    // 🆕 Configurar listeners específicos del checkout
+    setupCheckoutListeners() {
+        // Listener para método de comunicación
+        document.querySelectorAll('input[name="metodoComunicacion"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                this.toggleCommunicationFields(e.target.value);
+            });
+        });
+
+        // Listener para método de entrega
+        document.querySelectorAll('input[name="metodoEntrega"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    this.toggleDeliveryFields(e.target.value);
+                });
+            });
+    }
+
+    // 🆕 Mostrar/ocultar campos según método de comunicación
+    toggleCommunicationFields(metodo) {
+        const whatsappFields = document.getElementById('whatsapp-fields');
+        const emailFields = document.getElementById('email-fields');
+        
+        if (metodo === 'whatsapp') {
+            whatsappFields.style.display = 'block';
+            emailFields.style.display = 'none';
+            document.getElementById('customerPhone').required = true;
+            document.getElementById('customerEmail').required = false;
+            document.getElementById('customerEmail').value = '';
+        } else {
+            whatsappFields.style.display = 'none';
+            emailFields.style.display = 'block';
+            document.getElementById('customerPhone').required = false;
+            document.getElementById('customerEmail').required = true;
+            document.getElementById('customerPhone').value = '';
+        }
+    }
+
+    // 🆕 Mostrar/ocultar campos según método de entrega
+    toggleDeliveryFields(metodo) {
+        const domicilioFields = document.getElementById('domicilio-fields');
+        const retiroFields = document.getElementById('retiro-fields');
+        
+        if (metodo === 'domicilio') {
+            domicilioFields.style.display = 'block';
+            retiroFields.style.display = 'none';
+            document.getElementById('customerName').required = true;
+            document.getElementById('customerAddress').required = true;
+            document.getElementById('customerNameRetiro').required = false;
+            document.getElementById('customerNameRetiro').value = '';
+        } else {
+            domicilioFields.style.display = 'none';
+            retiroFields.style.display = 'block';
+            document.getElementById('customerName').required = false;
+            document.getElementById('customerAddress').required = false;
+            document.getElementById('customerNameRetiro').required = true;
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerAddress').value = '';
+        }
+    }
+
+    // 🆕 Validar formulario según opciones seleccionadas
+    validateCheckoutForm(formData) {
+        // Validar nombre (siempre requerido)
+        if (!formData.nombre || formData.nombre.trim() === '') {
+            this.showNotification('Por favor, completa tu nombre', true);
+            return false;
+        }
+
+        // Validar según método de comunicación
+        if (formData.metodoComunicacion === 'whatsapp') {
+            if (!formData.telefono || formData.telefono.trim() === '') {
+                this.showNotification('Por favor, ingresa tu número de WhatsApp', true);
+                return false;
+            }
+            // Validar formato de teléfono (mínimo 10 dígitos)
+            const telefonoLimpio = formData.telefono.replace(/\D/g, '');
+            if (telefonoLimpio.length < 10) {
+                this.showNotification('Por favor, ingresa un número de teléfono válido (mínimo 10 dígitos)', true);
+                return false;
+            }
+        } else {
+            if (!formData.email || formData.email.trim() === '') {
+                this.showNotification('Por favor, ingresa tu email', true);
+                return false;
+            }
+            // Validar email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(formData.email)) {
+                this.showNotification('Por favor, ingresa un email válido', true);
+                return false;
+            }
+        }
+
+        // Validar dirección según método de entrega
+        if (formData.metodoEntrega === 'domicilio') {
+            if (!formData.direccion || formData.direccion.trim() === '') {
+                this.showNotification('Por favor, completa la dirección de entrega', true);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // 🆕 Procesar pedido (Checkout) - Versión Actualizada
+    async processOrder(formData) {
+        try {
+            // Validar formulario
+            if (!this.validateCheckoutForm(formData)) {
+                return false;
+            }
+
+            // Crear objeto del pedido
+            const pedido = {
+                id: Date.now(),
+                fecha: new Date().toLocaleString(),
+                cliente: {
+                    nombre: formData.nombre,
+                    email: formData.metodoComunicacion === 'email' ? formData.email : formData.email || 'No especificado',
+                    telefono: formData.metodoComunicacion === 'whatsapp' ? formData.telefono : formData.telefono || 'No especificado',
+                    metodoComunicacion: formData.metodoComunicacion,
+                    metodoEntrega: formData.metodoEntrega,
+                    direccion: formData.metodoEntrega === 'domicilio' ? formData.direccion : 'Retiro en local'
+                },
+                items: this.getOrderSummary(),
+                total: this.getTotal(),
+            };
+
+            // Mostrar loading en el botón
+            const btn = document.getElementById('confirmOrderBtn');
+            btn.classList.add('btn-loading');
+            btn.disabled = true;
+
+            // Intentar enviar según método de comunicación
+            let envioExitoso = false;
+            
+            if (formData.metodoComunicacion === 'whatsapp') {
+                envioExitoso = await this.sendWhatsApp(pedido, true);
+            } else {
+                // Intenta enviar el mail real
+                envioExitoso = await cart.sendEmail(pedido, true);
+            }
+
+            // Remover loading
+            btn.classList.remove('btn-loading');
+            btn.disabled = false;
+
+            console.log('envioExitoso: ', envioExitoso);
+
+            // Si el envío fue exitoso, mostrar confirmación
+            if (envioExitoso) {
+                // Guardar pedido
+                this.saveOrderHistory(pedido);
+                
+                // Mostrar confirmación
+                this.showConfirmation(pedido);
+                
+                // Limpiar carrito
+                this.updateBadgeProducto(false, true);
+                this.items = [];
+                this.saveCart();
+                this.updateBadge();
+                
+                // Cerrar modal de checkout
+                document.getElementById('checkout-modal').style.display = 'none';
+                
+                this.showNotification('¡Pedido confirmado y enviado!');
+                return true;
+            } else {
+                this.showNotification('Error al enviar el pedido. Por favor, intenta nuevamente.', true);
+                return false;
+            }
+
+        } catch (error) {
+            console.error('Error al procesar pedido:', error);
+            this.showNotification('Error al procesar el pedido', true);
+            return false;
+        }
+    }
+
+    // 🆕 Enviar por WhatsApp - Versión actualizada con retorno booleano
+    async sendWhatsApp(pedido, soloEnvio = false) {
+        try {
+            if (!pedido) {
+                this.showNotification('No hay pedido para enviar', true);
+                return false;
+            }
+
+            // Formatear mensaje para WhatsApp
+            let mensaje = `🌿 *LA MANDINGA - NUEVO PEDIDO*\n\n`;
+            mensaje += `📋 *Número de Pedido:* #${String(pedido.id).padStart(8, '0')}\n`;
+            mensaje += `📅 *Fecha:* ${pedido.fecha}\n\n`;
+            mensaje += `👤 *Datos del Cliente:*\n`;
+            mensaje += `Nombre: ${pedido.cliente.nombre}\n`;
+            
+            if (pedido.cliente.metodoComunicacion === 'whatsapp') {
+                mensaje += `WhatsApp: ${pedido.cliente.telefono}\n`;
+            } else {
+                mensaje += `Email: ${pedido.cliente.email}\n`;
+            }
+            mensaje += `📦 *Método de entrega:* ${pedido.cliente.metodoEntrega === 'domicilio' ? 'Envío a domicilio' : 'Retiro en local'}\n`;
+            
+            if (pedido.cliente.metodoEntrega === 'domicilio') {
+                mensaje += `📍 *Dirección:* ${pedido.cliente.direccion}\n\n`;
+            } else {
+                mensaje += `📍 *Retiro en:* Ruta Prov. 89 nº12890, Las Vegas - Potrerillos\n`;
+                mensaje += `🕐 *Horario:* Sab y Dom de 10 a 18hs\n\n`;
+            }
+            
+            mensaje += `🛒 *Productos:*\n`;
+            
+            pedido.items.forEach((item, index) => {
+                mensaje += `${index + 1}. ${item.nombre} x ${item.cantidad} = $${item.subtotal.toFixed(2)}\n`;
+            });
+            
+            mensaje += `\n💰 *Total: $${pedido.total.toFixed(2)}*\n\n`;
+            mensaje += `💳 El pago se realiza al recibir los productos\n\n`;
+            mensaje += `¡Gracias por tu pedido! 🌿`;
+
+            // Codificar mensaje para URL
+            const mensajeCodificado = encodeURIComponent(mensaje);
+            
+            // Número de WhatsApp (reemplazar con el número real)
+            // Formato: código país + número sin + ni espacios
+            const numeroWhatsApp = '5492612523996';
+                         console.log('justo antes del whatsapp');
+            // Abrir WhatsApp
+            this.showNotification('Abriendo WhatsApp...');
+            let envioPendiente = await window.open(`https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`, '_blank');
+            
+            // En una implementación real, podrías usar la API de WhatsApp Business
+            if(envioPendiente){
+                console.log('Mensaje WhatsApp enviado:', mensaje);
+                return true;
+            }else{
+                console.log('error: No se pudo enviar el Mensaje WhatsApp');
+            }
+            
+        } catch (error) {
+            console.error('Error al enviar WhatsApp:', error);
+            if (!soloEnvio) this.showNotification('Error al enviar por WhatsApp', true);
+            return false;
+        }
+    }
+
+    async sendEmail(pedido, soloEnvio = false) {
+    try {
+        if (!pedido) {
+            this.showNotification('No hay pedido para enviar', true);
+            return false;
+        }
+
+        // Generar HTML del email
+        const htmlBody = this.generateEmailHTML(pedido);
+
+        // Enviar al backend
+        const response = await fetch('http://localhost:3000/api/email/send-order-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                to: pedido.cliente.email,
+                subject: `Pedido #${String(pedido.id).padStart(8, '0')} - La Mandinga`,
+                html: htmlBody,
+            })
+        });
+
+        const result = await response.json();
+
+            if (!response.ok) {
+            throw new Error(result.message || 'Error al enviar email');
+        }
+
+        if (!soloEnvio) {
+            this.showNotification('✅ Correo enviado exitosamente');
+        }
+
+        console.log('Email enviado:', result);
+        return true;
+
+    } catch (error) {
+        console.error('Error al enviar email:', error);
+        if (!soloEnvio) this.showNotification('Error al enviar por email', true);
+        return false;
+    }
+}
+
+
+
+    // Método para generar HTML del email
+generateEmailHTML(pedido) {
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c2e 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            background: #f8f6f0;
+            padding: 20px;
+            border-radius: 0 0 8px 8px;
+        }
+        .section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e8e4dc;
+        }
+        .section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .section-title {
+            font-weight: bold;
+            color: #2d5016;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        .product-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #e8e4dc;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        .total {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2d5016;
+            text-align: right;
+            padding-top: 10px;
+            margin-top: 10px;
+            border-top: 2px solid #4a7c2e;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e8e4dc;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .badge {
+            display: inline-block;
+            background: #4a7c2e;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+        .info-row {
+            padding: 5px 0;
+        }
+        .info-label {
+            font-weight: bold;
+            display: inline-block;
+            min-width: 120px;
+        }
+        .highlight {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .payment-info {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 style="margin: 0;">🌿 La Mandinga</h1>
+        <p style="margin: 5px 0 0 0; opacity: 0.9;">Productos Saludables</p>
+    </div>
+    
+    <div class="content">
+        <h2 style="color: #2d5016; margin-top: 0;">¡Gracias por tu pedido, ${pedido.cliente.nombre}!</h2>
+        <p style="font-size: 1.1em;">Hemos recibido tu pedido correctamente. Aquí tienes los detalles:</p>
+        
+        <div class="section">
+            <div class="section-title">📋 Información del Pedido</div>
+            <div class="info-row">
+                <span class="info-label">Número de Pedido:</span>
+                <span class="badge">#${String(pedido.id).padStart(8, '0')}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">📅 Fecha:</span>
+                <span>${pedido.fecha}</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">👤 Datos del Cliente</div>
+            <div class="info-row">
+                <span class="info-label">Nombre:</span>
+                <span>${pedido.cliente.nombre}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">${pedido.cliente.metodoComunicacion === 'email' ? '✉️ Email:' : '📱 WhatsApp:'}</span>
+                <span>${pedido.cliente.metodoComunicacion === 'email' ? pedido.cliente.email : pedido.cliente.telefono}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">📦 Entrega:</span>
+                <span>${pedido.cliente.metodoEntrega === 'domicilio' ? 'Envío a domicilio' : 'Retiro en local'}</span>
+            </div>
+            ${pedido.cliente.metodoEntrega === 'domicilio' ? `
+            <div class="info-row">
+                <span class="info-label">📍 Dirección:</span>
+                <span>${pedido.cliente.direccion}</span>
+            </div>
+            ` : `
+            <div class="highlight">
+                <div><strong>📍 Retiro en:</strong> Ruta Prov. 89 nº12890, Las Vegas - Potrerillos</div>
+                <div><strong>🕐 Horario:</strong> Sábados y Domingos de 10 a 18hs</div>
+            </div>
+            `}
+        </div>
+        
+        <div class="section">
+            <div class="section-title">🛒 Productos</div>
+            ${pedido.items.map((item) => `
+                <div class="product-item">
+                    <span>${item.nombre}</span>
+                    <span style="float: right;">x ${item.cantidad} = $${item.subtotal.toFixed(2)}</span>
+                </div>
+            `).join('')}
+            <div class="total">
+                Total: $${pedido.total.toFixed(2)}
+            </div>
+        </div>
+        
+        <div class="payment-info">
+            <strong>💳 Información de pago:</strong><br>
+            El pago del pedido se realiza al recibir los productos.
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px;">
+            <p style="margin: 0; color: #2d5016; font-weight: bold;">
+                🌿 ¡Gracias por confiar en La Mandinga!
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>Este es un mensaje automático. Por favor, no respondas a este correo.</p>
+            <p>🌿 La Mandinga - Productos Saludables</p>
+            <p style="font-size: 0.8em; color: #999;">
+                Ruta Prov. 89 nº12890, Las Vegas - Potrerillos<br>
+                Sábados y Domingos de 10 a 18hs
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+    `;
+}
+
+    // // 🆕 Enviar por Email - Versión actualizada con retorno booleano
+    // async sendEmail(pedidoOriginal) {
+    //     const pedido = pedidoOriginal;
+    //     try {
+    //         if (!pedido) {
+    //             this.showNotification('No hay pedido para enviar', true);
+    //             return false;
+    //         }
+
+            
+
+
+
+
+//             const asunto = `Pedido #${String(pedido.id).padStart(8, '0')} - La Mandinga`;
+
+//             let cuerpo = `<h1 style="margin: 0;">🌿 La Mandinga</h1>`;
+//             cuerpo += `<p style="margin: 5px 0 0 0; opacity: 0.9;">Productos Saludables</p>`;
+            
+//             <h1>¡Gracias por tu pedido, ${pedido.cliente.nombre}!</h1>`;
+//             cuerpo += `<p><strong>Número de Pedido:</strong> #${String(pedido.id).padStart(8, '0')}</p>`;
+            
+            
+//         <h2 style="color: #2d5016; margin-top: 0;">¡Gracias por tu pedido, ${pedido.cliente.nombre}!</h2>
+//         <p style="font-size: 1.1em;">Hemos recibido tu pedido correctamente. Aquí tienes los detalles:</p>
+        
+//         <div class="section">
+//             <div class="section-title">📋 Información del Pedido</div>
+//             <div class="info-row">
+//                 <span class="info-label">Número de Pedido:</span>
+//                 <span class="badge">#${String(pedido.id).padStart(8, '0')}</span>
+//             </div>
+//             <div class="info-row">
+//                 <span class="info-label">📅 Fecha:</span>
+//                 <span>${pedido.fecha}</span>
+//             </div>
+//         </div>
+        
+//         <div class="section">
+//             <div class="section-title">👤 Datos del Cliente</div>
+//             <div class="info-row">
+//                 <span class="info-label">Nombre:</span>
+//                 <span>${pedido.cliente.nombre}</span>
+//             </div>
+//             <div class="info-row"></div>
+//             <span class="info-label">${pedido.cliente.metodoComunicacion === 'email' ? '✉️ Email:' : '📱 WhatsApp:'}</span>
+//                 <span>${pedido.cliente.metodoComunicacion === 'email' ? pedido.cliente.email : pedido.cliente.telefono}</span>
+//             </div>
+//             <div class="info-row">
+//                 <span class="info-label">📦 Entrega:</span>
+//                 <span>${pedido.cliente.metodoEntrega === 'domicilio' ? 'Envío a domicilio' : 'Retiro en local'}</span>
+//             </div>
+//             ${pedido.cliente.metodoEntrega === 'domicilio' ? `
+//             <div class="info-row">
+//                 <span class="info-label">📍 Dirección:</span>
+//                 <span>${pedido.cliente.direccion}</span>
+//             </div>
+//                  ` : `
+//             <div class="highlight">
+//                 <div><strong>📍 Retiro en:</strong> Ruta Prov. 89 nº12890, Las Vegas - Potrerillos</div>
+//                 <div><strong>🕐 Horario:</strong> Sábados y Domingos de 10 a 18hs</div>
+//             </div>
+//             `}
+//         </div>
+//          <div class="section">
+//             <div class="section-title">🛒 Productos</div>
+//             ${pedido.items.map((item) => `
+//                 <div class="product-item">
+//                     <span>${item.nombre}</span>
+//                     <span style="float: right;">x ${item.cantidad} = $${item.subtotal.toFixed(2)}</span>
+//                 </div>
+//             `).join('')}
+//             <div class="total">
+//                 Total: $${pedido.total.toFixed(2)}
+//             </div>
+//         </div>
+        
+//         <div class="payment-info">
+//             <strong>💳 Información de pago:</strong><br>
+//             El pago del pedido se realiza al recibir los productos.
+//         </div>
+        
+//         <div style="text-align: center; margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px;">
+//             <p style="margin: 0; color: #2d5016; font-weight: bold;">
+//                 🌿 ¡Gracias por confiar en La Mandinga!
+//             </p>
+//         </div>
+        
+//         <div class="footer">
+//             <p>Este es un mensaje automático. Por favor, no respondas a este correo.</p>
+//             <p>🌿 La Mandinga - Productos Saludables</p>
+//             <p style="font-size: 0.8em; color: #999;">
+//                 Ruta Prov. 89 nº12890, Las Vegas - Potrerillos<br>
+//                 Sábados y Domingos de 10 a 18hs
+//             </p>
+//         </div>
+//     </div>
+// </body>
+// </html>
+// `;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            // let cuerpo = `Hola ${pedido.cliente.nombre},\n\n`;
+            // cuerpo += `Gracias por tu pedido en La Mandinga. Aquí tienes los detalles:\n\n`;
+            // cuerpo += `📋 Número de Pedido: #${String(pedido.id).padStart(8, '0')}\n`;
+            // cuerpo += `📅 Fecha: ${pedido.fecha}\n\n`;
+            
+            // cuerpo += `👤 Datos del cliente:\n`;
+            // cuerpo += `Nombre: ${pedido.cliente.nombre}\n`;
+            // if (pedido.cliente.metodoComunicacion === 'email') {
+            //     cuerpo += `Email: ${pedido.cliente.email}\n`;
+            // } else {
+            //     cuerpo += `WhatsApp: ${pedido.cliente.telefono}\n`;
+            // }
+            // cuerpo += `📦 Método de entrega: ${pedido.cliente.metodoEntrega === 'domicilio' ? 'Envío a domicilio' : 'Retiro en local'}\n`;
+            
+            // if (pedido.cliente.metodoEntrega === 'domicilio') {
+            //     cuerpo += `📍 Dirección: ${pedido.cliente.direccion}\n`;
+            // } else {
+            //     cuerpo += `📍 Retiro en: Ruta Prov. 89 nº12890, Las Vegas - Potrerillos\n`;
+            //     cuerpo += `🕐 Horario: Sab y Dom de 10 a 18hs\n`;
+            // }
+            
+            // cuerpo += `🛒 Productos:\n`;
+            
+            // pedido.items.forEach((item) => {
+            //     cuerpo += `- ${item.nombre} x ${item.cantidad} = $${item.subtotal.toFixed(2)}\n`;
+            // });
+            
+            // cuerpo += `\n💰 Total: $${pedido.total.toFixed(2)}\n\n`;
+            // cuerpo += `💳 El pago del pedido se realiza al recibir los productos`;
+            // cuerpo += `¡Gracias por confiar en La Mandinga!\n\n`;
+            // cuerpo += `🌿 La Mandinga - Productos Saludables`;
+
+    //         // Crear enlace mailto
+    //         const mailtoUrl = `mailto:${pedido.cliente.email}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+    //                  console.log('justo antes de mail');
+    //         // Abrir cliente de correo
+    //         // if (!soloEnvio) {
+    //             console.log('entro a mail');
+    //             window.location.href = mailtoUrl;
+    //             // window.open(`https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`, '_blank');
+    //             this.showNotification('Abriendo cliente de correo...');
+    //         // }
+            
+    //         // Simular envío exitoso
+    //         console.log('Email enviado:', cuerpo);
+            
+    //         return true;
+    //     } catch (error) {
+    //         console.error('Error al enviar email:', error);
+    //         if (!soloEnvio) this.showNotification('Error al enviar por email', true);
+    //         return false;
+    //     }
+    // }
+
+        // 🆕 Abrir modal de checkout - Actualizado
+    openCheckout() {
+        if (this.items.length === 0) {
+            this.showNotification('El carrito está vacío', true);
+            return;
+        }
+
+        const checkoutModal = document.getElementById('checkout-modal');
+        if (!checkoutModal) {
+            console.error('Modal de checkout no encontrado');
+            return;
+        }
+
+        // Resetear formulario
+        const form = document.getElementById('checkoutForm');
+        form.reset();
+        
+        // Configurar estado inicial
+        this.toggleCommunicationFields('whatsapp');
+        this.toggleDeliveryFields('domicilio');
+        
+        // Actualizar resumen del pedido
+        this.updateCheckoutSummary();
+        checkoutModal.style.display = 'block';
     }
 
     // Guardar en localStorage
@@ -177,11 +862,83 @@ class ShoppingCart {
         }, 3000);
     }
 
-    //ESCRIBIR LOGICA DE LA COMPRA... Envia whatsapp con lista
-    gestionarPedido(items){
-        console.log('Pedido Confirmado');
-        return true;
+    // 🆕 Actualizar resumen en checkout
+    updateCheckoutSummary() {
+        const summaryContainer = document.getElementById('order-items-summary');
+        const totalElement = document.getElementById('checkout-total');
+        
+        if (!summaryContainer || !totalElement) return;
+
+        const items = this.getOrderSummary();
+        summaryContainer.innerHTML = items.map(item => `
+            <div class="checkout-item">
+                <span>${item.nombre} x ${item.cantidad}</span>
+                <span>$${item.subtotal.toFixed(2)}</span>
+            </div>
+        `).join('');
+
+        const total = this.getTotal();
+        totalElement.textContent = `$${total.toFixed(2)}`;
     }
+
+    // 🆕 Guardar historial de pedidos
+    saveOrderHistory(pedido) {
+        const history = JSON.parse(localStorage.getItem('orderHistory') || '[]');
+        history.push(pedido);
+        localStorage.setItem('orderHistory', JSON.stringify(history));
+    }
+
+    // 🆕 Mostrar confirmación del pedido
+    showConfirmation(pedido) {
+        const modal = document.getElementById('confirmation-modal');
+        const details = document.getElementById('order-confirmation-details');
+        
+        if (!modal || !details) return;
+
+        // Generar número de pedido formateado
+        const orderNumber = `#${String(pedido.id).padStart(8, '0')}`;
+        
+        details.innerHTML = `
+            <div class="confirmation-order-info">
+                <div class="order-number">${orderNumber}</div>
+                <div class="order-date">📅 ${pedido.fecha}</div>
+            </div>
+            <div class="confirmation-customer">
+                <p><strong>Cliente:</strong> ${pedido.cliente.nombre}</p>
+                <p><strong>Email:</strong> ${pedido.cliente.email}</p>
+                <p><strong>Teléfono:</strong> ${pedido.cliente.telefono}</p>
+                <p><strong>Dirección:</strong> ${pedido.cliente.direccion}</p>
+            </div>
+            <div class="confirmation-items">
+                <h4>Productos</h4>
+                ${pedido.items.map(item => `
+                    <div class="confirmation-item">
+                        <span>${item.nombre} x ${item.cantidad}</span>
+                        <span>$${item.subtotal.toFixed(2)}</span>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="confirmation-total">
+                <strong>Total:</strong> <span>$${pedido.total.toFixed(2)}</span>
+            </div>
+        `;
+        
+        modal.style.display = 'block';
+    }
+
+    // 🆕 Cerrar modales
+    closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+          
+    //ESCRIBIR LOGICA DE LA COMPRA... Envia whatsapp con lista
+    // gestionarPedido(items){
+    //     console.log('Pedido Confirmado');
+    //     return true;
+    // }
 
     // Configurar event listeners
     setupEventListeners() {
@@ -197,26 +954,71 @@ class ShoppingCart {
             document.getElementById('cart-modal').style.display = 'none';
         });
 
-        // Finalizar compra
+        // 🆕 Abrir checkout desde el carrito
         document.getElementById('checkoutBtn').addEventListener('click', () => {
-            if (this.items.length === 0) {
-                this.showNotification('El carrito está vacío', true);
-                return;
-            }
-            let confirmacionCompra = false;
-            confirmacionCompra = this.gestionarPedido(this.items);
-            if(confirmacionCompra){
-                this.updateBadgeProducto(false, true);
-                this.showNotification('¡Tu pedido ha sido gestionado! Pronto recibirás más info por Whatsapp. Muchas Gracias!');
-                this.items = [];
-                this.saveCart();
-                this.updateBadge();
-                this.updateCartModal();
-                document.getElementById('cart-modal').style.display = 'none';
-            }else{
-                this.showNotification('¡Tu pedido no ha sido gestionado. Aún puedes agregar o quitar productos del carrito, cancelar el pedido o confirmarlo. Muchas Gracias!');
+            document.getElementById('cart-modal').style.display = 'none';
+            this.openCheckout();
+        });
+
+        // 🆕 Cerrar checkout con 'X'
+        document.getElementById('closeCheckout').addEventListener('click', () => {
+            this.closeModal('checkout-modal');
+        });
+
+        // 🆕 Cancelar checkout con boton inferior
+        document.getElementById('cancelarCheckout').addEventListener('click', () => {
+            this.closeModal('checkout-modal');
+        });
+
+        // 🆕 Cerrar confirmación con 'X'
+        document.getElementById('closeConfirmation').addEventListener('click', () => {
+            this.closeModal('confirmation-modal');
+        });
+
+        // 🆕 Procesar formulario de checkout
+        document.getElementById('checkoutForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const formData = {
+                nombre: document.getElementById('customerName').value,
+                email: document.getElementById('customerEmail').value,
+                telefono: document.getElementById('customerPhone').value,
+                direccion: document.getElementById('customerAddress').value,
+            };
+
+            this.processOrder(formData);
+        });
+
+        // 🆕 Cerrar modales al hacer clic fuera
+        window.addEventListener('click', (event) => {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
             }
         });
+
+     
+
+
+        // // Finalizar compra
+        // document.getElementById('checkoutBtn').addEventListener('click', () => {
+        //     if (this.items.length === 0) {
+        //         this.showNotification('El carrito está vacío', true);
+        //         return;
+        //     }
+        //     let confirmacionCompra = false;
+        //     confirmacionCompra = this.gestionarPedido(this.items);
+        //     if(confirmacionCompra){
+        //         this.updateBadgeProducto(false, true);
+        //         this.showNotification('¡Tu pedido ha sido gestionado! Pronto recibirás más info por Whatsapp. Muchas Gracias!');
+        //         this.items = [];
+        //         this.saveCart();
+        //         this.updateBadge();
+        //         this.updateCartModal();
+        //         document.getElementById('cart-modal').style.display = 'none';
+        //     }else{
+        //         this.showNotification('¡Tu pedido no ha sido gestionado. Aún puedes agregar o quitar productos del carrito, cancelar el pedido o confirmarlo. Muchas Gracias!');
+        //     }
+        // });
 
         // Configuración de event delegation para botones dinámicos
         document.addEventListener('DOMContentLoaded', function() {
@@ -273,20 +1075,61 @@ window.addToCart = function(productId) {
     }
 };
 
-// Agregar botón "Agregar al carrito" a los productos en el detalle
-window.loadProductDetail = async function(productId) {
+// 🆕 Funciones globales para manejar los cambios
+window.toggleCommunicationFields = function(metodo) {
+    cart.toggleCommunicationFields(metodo);
+};
+
+window.toggleDeliveryFields = function(metodo) {
+    cart.toggleDeliveryFields(metodo);
+};
+
+// Actualizar el event listener del formulario
+document.addEventListener('DOMContentLoaded', function() {
     // ... código existente ...
     
-    // Modificar el HTML del detalle para incluir botón de agregar al carrito
-    productDetail.innerHTML = `
-        <!-- ... información existente ... -->
-        <button onclick="cart.addItem({
-            id: ${product.id},
-            name: '${product.name}',
-            precioYunidad: ${product.precioYunidad || 0},
-            precio: ${product.precio || 0}
-        })" class="add-to-cart-btn">
-            <i class="fas fa-shopping-cart"></i> Agregar al Carrito
-        </button>
-    `;
-};
+    // Procesar formulario de checkout
+    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Recopilar datos del formulario
+        const metodoComunicacion = document.querySelector('input[name="metodoComunicacion"]:checked')?.value || 'whatsapp';
+        const metodoEntrega = document.querySelector('input[name="metodoEntrega"]:checked')?.value || 'domicilio';
+        
+        let nombre = ''
+        if (metodoEntrega === 'domicilio') {
+            nombre = document.getElementById('customerName').value;
+        } else {
+            nombre = document.getElementById('customerNameRetiro').value;
+        }
+        
+        const formData = {
+            nombre: nombre,
+            email: document.getElementById('customerEmail').value,
+            telefono: document.getElementById('customerPhone').value,
+            direccion: document.getElementById('customerAddress').value,
+            metodoComunicacion: metodoComunicacion,
+            metodoEntrega: metodoEntrega,
+        };
+
+        cart.processOrder(formData);
+    });
+});
+
+// // Agregar botón "Agregar al carrito" a los productos en el detalle
+// window.loadProductDetail = async function(productId) {
+//     // ... código existente ...
+    
+//     // Modificar el HTML del detalle para incluir botón de agregar al carrito
+//     productDetail.innerHTML = `
+//         <!-- ... información existente ... -->
+//         <button onclick="cart.addItem({
+//             id: ${product.id},
+//             name: '${product.name}',
+//             precioYunidad: ${product.precioYunidad || 0},
+//             precio: ${product.precio || 0}
+//         })" class="add-to-cart-btn">
+//             <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+//         </button>
+//     `;
+// };

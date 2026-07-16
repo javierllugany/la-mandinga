@@ -121,7 +121,136 @@
                     <strong>Total:</strong>
                     <span id="cartTotal">$0.00</span>
                 </div>
-                <button class="checkout-btn" id="checkoutBtn">Completar el Pedido</button>
+                <button class="checkout-btn btn-checkout" id="checkoutBtn">Gestionar el Pedido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CHECKOUT -->
+<div id="checkout-modal" class="modal">
+    <div class="modal-content checkout-content">
+        <span class="close-modal" id="closeCheckout">&times;</span>
+        <h2>📋 Datos para Entregar Pedido</h2>
+
+        <form id="checkoutForm">
+                <!-- <div class="form-group">
+                    <label for="customerName">Nombre completo:</label>
+                    <input type="text" id="customerName" required placeholder="Tu nombre completo">
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerEmail">Email:</label>
+                    <input type="email" id="customerEmail" required placeholder="tu@email.com">
+                </div>
+        
+        <form id="checkoutForm"> -->
+            <!-- Primer Cambio: Método de comunicación -->
+            <div class="form-group">
+                <label>¿Cómo prefieres recibir la confirmación?</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="metodoComunicacion" value="whatsapp" checked>
+                        <span class="radio-label">📱 WhatsApp</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="metodoComunicacion" value="email">
+                        <span class="radio-label">✉️ Email</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Campos condicionales -->
+            <div id="whatsapp-fields">
+                <div class="form-group">
+                    <label for="customerPhone">📱 Número de WhatsApp:</label>
+                    <input type="tel" id="customerPhone" required placeholder="+5492611234567">
+                    <small class="help-text">Incluye código de país (ej: "+54" para Argentina seguido de "9")</small>
+                </div>
+            </div>
+
+            <div id="email-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="customerEmail">✉️ Email:</label>
+                    <input type="email" id="customerEmail" placeholder="tu@email.com">
+                    <small class="help-text">Recibirás la confirmación por email</small>
+                </div>
+            </div>
+
+            <!-- Segundo Cambio: Método de entrega -->
+            <div class="form-group">
+                <label>¿Cómo deseas recibir tu pedido?</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="metodoEntrega" value="domicilio" checked>
+                        <span class="radio-label">🏠 Envío a domicilio</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="metodoEntrega" value="retiro">
+                        <span class="radio-label">🏪 Retiro en local</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Campos condicionales para dirección -->
+            <div id="domicilio-fields">
+                <div class="form-group">
+                    <label for="customerName">Nombre completo:</label>
+                    <input type="text" id="customerName" required placeholder="Tu nombre completo">
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerAddress">Dirección de entrega:</label>
+                    <textarea id="customerAddress" rows="3" required placeholder="Calle, número, ciudad"></textarea>
+                </div>
+            </div>
+
+            <div id="retiro-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="customerNameRetiro">Nombre completo:</label>
+                    <input type="text" id="customerNameRetiro" placeholder="Tu nombre completo">
+                </div>
+                <div class="info-box">
+                    <i class="fas fa-info-circle"></i>
+                    <p><strong>Dirección de retiro:</strong> La Mandinga: Ruta 89 nº 18000 - Las Vegas - Potrerillos</p>
+                    <p><strong>Horario:</strong> Sábados y Domingos de 10:00 a 18:00</p>
+                </div>
+            </div>
+            
+            <div class="order-summary">
+                <h4>🛒 Resumen del pedido</h4>
+                <div id="order-items-summary">
+                    <!-- Items dinámicos -->
+                </div>
+                <div class="order-total">
+                    <strong>Total:</strong> <span id="checkout-total">$0.00</span>
+                </div>
+            </div>
+                 <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelarCheckout">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="confirmOrderBtn">
+                        Confirmar Pedido
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN -->
+    <div id="confirmation-modal" class="modal">
+        <div class="modal-content confirmation-content">
+            <span class="close-modal" id="closeConfirmation">&times;</span>
+            
+            <div class="confirmation-header">
+                <div class="confirmation-icon">✅</div>
+                <h2>¡Pedido Confirmado!</h2>
+                <p>Tu pedido ha sido procesado exitosamente.</p>
+                <p>El PAGO se realiza al recibir los productos.</p>
+            </div>
+            
+            <div id="order-confirmation-details">
+                <!-- Detalles dinámicos -->
             </div>
         </div>
     </div>

@@ -13,6 +13,7 @@ const cors = require('cors');
 const productRoutes = require('./routes/productRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const catalogoRoutes = require('./routes/catalogoRoutes');
+const emailRoutes = require('./routes/emailRoutes');
 //const { testConnection } = require('./config/database');
 
 const db = require('./config/database');
@@ -45,6 +46,7 @@ const dbConfig = {
 app.use('/api/productos', productRoutes);
 app.use('/api/categorias', categoryRoutes);
 app.use('/api/catalogo', catalogoRoutes);
+app.use('/api/email', emailRoutes); 
 
 // Ruta de prueba
 app.get('/api/health', (req, res) => {
