@@ -1,5 +1,6 @@
 // src/services/emailService.js
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 // Configuración para Yahoo
 const transporter = nodemailer.createTransport({

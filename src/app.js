@@ -5,7 +5,7 @@ const path = require('path');
 const app = express();
 
 const cors = require('cors');
-//const helmet = require('helmet');
+const helmet = require('helmet');
 
 // anular en PRODUCCION y activar en DESARROLLO
 //const adminRoutes = require('./routes/adminRoutes');
@@ -18,14 +18,45 @@ const emailRoutes = require('./routes/emailRoutes');
 
 const db = require('./config/database');
 
+// app.use(cors({
+    //     origin: 'http:localhost:3000', //el frontend
+    //     methods: ['GET','POST','PUT','DELETE'],
+    //     allowedHeaders: ['Content-Type', 'Autorization']
+    // }));
+    
+//Aplicar CORS
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Lista blanca de dominios permitidos
+    const allowedOrigins = [
+      'http://localhost:3000',  //el frontend
+      'https://iguanapop.net.ar/lamandinga',
+      process.env.FRONTEND_URL
+    ];
+    
+    // Permitir solicitudes sin origen (como Postman)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('No permitido por CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true, // Permite enviar cookies
+  maxAge: 86400 // Cache preflight por 24 horas
+};
+
+app.use(cors(corsOptions));
+
 // Middleware
+// app.use(helmet({
+//     crossOriginResourcePolicy: { policy: "cross-origin" }
+// }));
 app.use(express.json());
 
-app.use(cors({
-	origin: 'http:localhost:3000', //el frontend
-	methods: ['GET','POST','PUT','DELETE'],
-	allowedHeaders: ['Content-Type', 'Autorization']
-}));
 
 // ============================================================
 // CONFIGURACIÓN DE LA BASE DE DATOS
