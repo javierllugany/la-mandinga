@@ -6,7 +6,7 @@ class ShoppingCart {
         // Ejecutar updateBadgeProducto después de 2 segundos
         setTimeout(() => {
             this.updateBadgeProducto();
-        }, 1000);
+        }, 3000);
         this.setupEventListeners();
         this.setupCheckoutListeners(); // Nuevo método
     }
@@ -265,7 +265,10 @@ class ShoppingCart {
             }
 
             // Formatear mensaje para WhatsApp
-            let mensaje = `🌿 *LA MANDINGA - NUEVO PEDIDO*\n\n`;
+            let mensaje = `🌿 *LA MANDINGA - Productos Saludables*\n\n`;
+            mensaje += `*¡Gracias por tu pedido, ${pedido.cliente.nombre}*\n`;
+            mensaje += `Hemos recibido tu pedido correctamente.\n`;
+            mensaje += `Aquí tienes los detalles:\n\n`;
             mensaje += `📋 *Número de Pedido:* #${String(pedido.id).padStart(8, '0')}\n`;
             mensaje += `📅 *Fecha:* ${pedido.fecha}\n\n`;
             mensaje += `👤 *Datos del Cliente:*\n`;
@@ -293,7 +296,7 @@ class ShoppingCart {
             
             mensaje += `\n💰 *Total: $${pedido.total.toFixed(2)}*\n\n`;
             mensaje += `💳 El pago se realiza al recibir los productos\n\n`;
-            mensaje += `¡Gracias por tu pedido! 🌿`;
+            mensaje += `¡Gracias por confiar en La Mandinga! 🌿`;
 
             // Codificar mensaje para URL
             const mensajeCodificado = encodeURIComponent(mensaje);
@@ -301,19 +304,9 @@ class ShoppingCart {
             // Número de WhatsApp (reemplazar con el número real)
             // Formato: código país + número sin + ni espacios
             const numeroWhatsApp = '5492612523996';
-                         console.log('justo antes del whatsapp');
             // Abrir WhatsApp
             this.showNotification('Abriendo WhatsApp...');
-            let envioPendiente = await window.open(`https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`, '_blank');
-            
-            // En una implementación real, podrías usar la API de WhatsApp Business
-            if(envioPendiente){
-                console.log('Mensaje WhatsApp enviado:', mensaje);
-                return true;
-            }else{
-                console.log('error: No se pudo enviar el Mensaje WhatsApp');
-            }
-            
+            await window.open(`https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`, '_blank');
         } catch (error) {
             console.error('Error al enviar WhatsApp:', error);
             if (!soloEnvio) this.showNotification('Error al enviar por WhatsApp', true);
@@ -330,9 +323,8 @@ class ShoppingCart {
 
         // Generar HTML del email
         const htmlBody = this.generateEmailHTML(pedido);
-
         // Enviar al backend
-        const response = await fetch('http://localhost:3000/api/email/send-order-email', {
+        const response = await fetch(`${API_BASE_URL}/email/send-order-email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -550,178 +542,6 @@ generateEmailHTML(pedido) {
 </html>
     `;
 }
-
-    // // 🆕 Enviar por Email - Versión actualizada con retorno booleano
-    // async sendEmail(pedidoOriginal) {
-    //     const pedido = pedidoOriginal;
-    //     try {
-    //         if (!pedido) {
-    //             this.showNotification('No hay pedido para enviar', true);
-    //             return false;
-    //         }
-
-            
-
-
-
-
-//             const asunto = `Pedido #${String(pedido.id).padStart(8, '0')} - La Mandinga`;
-
-//             let cuerpo = `<h1 style="margin: 0;">🌿 La Mandinga</h1>`;
-//             cuerpo += `<p style="margin: 5px 0 0 0; opacity: 0.9;">Productos Saludables</p>`;
-            
-//             <h1>¡Gracias por tu pedido, ${pedido.cliente.nombre}!</h1>`;
-//             cuerpo += `<p><strong>Número de Pedido:</strong> #${String(pedido.id).padStart(8, '0')}</p>`;
-            
-            
-//         <h2 style="color: #2d5016; margin-top: 0;">¡Gracias por tu pedido, ${pedido.cliente.nombre}!</h2>
-//         <p style="font-size: 1.1em;">Hemos recibido tu pedido correctamente. Aquí tienes los detalles:</p>
-        
-//         <div class="section">
-//             <div class="section-title">📋 Información del Pedido</div>
-//             <div class="info-row">
-//                 <span class="info-label">Número de Pedido:</span>
-//                 <span class="badge">#${String(pedido.id).padStart(8, '0')}</span>
-//             </div>
-//             <div class="info-row">
-//                 <span class="info-label">📅 Fecha:</span>
-//                 <span>${pedido.fecha}</span>
-//             </div>
-//         </div>
-        
-//         <div class="section">
-//             <div class="section-title">👤 Datos del Cliente</div>
-//             <div class="info-row">
-//                 <span class="info-label">Nombre:</span>
-//                 <span>${pedido.cliente.nombre}</span>
-//             </div>
-//             <div class="info-row"></div>
-//             <span class="info-label">${pedido.cliente.metodoComunicacion === 'email' ? '✉️ Email:' : '📱 WhatsApp:'}</span>
-//                 <span>${pedido.cliente.metodoComunicacion === 'email' ? pedido.cliente.email : pedido.cliente.telefono}</span>
-//             </div>
-//             <div class="info-row">
-//                 <span class="info-label">📦 Entrega:</span>
-//                 <span>${pedido.cliente.metodoEntrega === 'domicilio' ? 'Envío a domicilio' : 'Retiro en local'}</span>
-//             </div>
-//             ${pedido.cliente.metodoEntrega === 'domicilio' ? `
-//             <div class="info-row">
-//                 <span class="info-label">📍 Dirección:</span>
-//                 <span>${pedido.cliente.direccion}</span>
-//             </div>
-//                  ` : `
-//             <div class="highlight">
-//                 <div><strong>📍 Retiro en:</strong> Ruta Prov. 89 nº12890, Las Vegas - Potrerillos</div>
-//                 <div><strong>🕐 Horario:</strong> Sábados y Domingos de 10 a 18hs</div>
-//             </div>
-//             `}
-//         </div>
-//          <div class="section">
-//             <div class="section-title">🛒 Productos</div>
-//             ${pedido.items.map((item) => `
-//                 <div class="product-item">
-//                     <span>${item.nombre}</span>
-//                     <span style="float: right;">x ${item.cantidad} = $${item.subtotal.toFixed(2)}</span>
-//                 </div>
-//             `).join('')}
-//             <div class="total">
-//                 Total: $${pedido.total.toFixed(2)}
-//             </div>
-//         </div>
-        
-//         <div class="payment-info">
-//             <strong>💳 Información de pago:</strong><br>
-//             El pago del pedido se realiza al recibir los productos.
-//         </div>
-        
-//         <div style="text-align: center; margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px;">
-//             <p style="margin: 0; color: #2d5016; font-weight: bold;">
-//                 🌿 ¡Gracias por confiar en La Mandinga!
-//             </p>
-//         </div>
-        
-//         <div class="footer">
-//             <p>Este es un mensaje automático. Por favor, no respondas a este correo.</p>
-//             <p>🌿 La Mandinga - Productos Saludables</p>
-//             <p style="font-size: 0.8em; color: #999;">
-//                 Ruta Prov. 89 nº12890, Las Vegas - Potrerillos<br>
-//                 Sábados y Domingos de 10 a 18hs
-//             </p>
-//         </div>
-//     </div>
-// </body>
-// </html>
-// `;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // let cuerpo = `Hola ${pedido.cliente.nombre},\n\n`;
-            // cuerpo += `Gracias por tu pedido en La Mandinga. Aquí tienes los detalles:\n\n`;
-            // cuerpo += `📋 Número de Pedido: #${String(pedido.id).padStart(8, '0')}\n`;
-            // cuerpo += `📅 Fecha: ${pedido.fecha}\n\n`;
-            
-            // cuerpo += `👤 Datos del cliente:\n`;
-            // cuerpo += `Nombre: ${pedido.cliente.nombre}\n`;
-            // if (pedido.cliente.metodoComunicacion === 'email') {
-            //     cuerpo += `Email: ${pedido.cliente.email}\n`;
-            // } else {
-            //     cuerpo += `WhatsApp: ${pedido.cliente.telefono}\n`;
-            // }
-            // cuerpo += `📦 Método de entrega: ${pedido.cliente.metodoEntrega === 'domicilio' ? 'Envío a domicilio' : 'Retiro en local'}\n`;
-            
-            // if (pedido.cliente.metodoEntrega === 'domicilio') {
-            //     cuerpo += `📍 Dirección: ${pedido.cliente.direccion}\n`;
-            // } else {
-            //     cuerpo += `📍 Retiro en: Ruta Prov. 89 nº12890, Las Vegas - Potrerillos\n`;
-            //     cuerpo += `🕐 Horario: Sab y Dom de 10 a 18hs\n`;
-            // }
-            
-            // cuerpo += `🛒 Productos:\n`;
-            
-            // pedido.items.forEach((item) => {
-            //     cuerpo += `- ${item.nombre} x ${item.cantidad} = $${item.subtotal.toFixed(2)}\n`;
-            // });
-            
-            // cuerpo += `\n💰 Total: $${pedido.total.toFixed(2)}\n\n`;
-            // cuerpo += `💳 El pago del pedido se realiza al recibir los productos`;
-            // cuerpo += `¡Gracias por confiar en La Mandinga!\n\n`;
-            // cuerpo += `🌿 La Mandinga - Productos Saludables`;
-
-    //         // Crear enlace mailto
-    //         const mailtoUrl = `mailto:${pedido.cliente.email}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-    //                  console.log('justo antes de mail');
-    //         // Abrir cliente de correo
-    //         // if (!soloEnvio) {
-    //             console.log('entro a mail');
-    //             window.location.href = mailtoUrl;
-    //             // window.open(`https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`, '_blank');
-    //             this.showNotification('Abriendo cliente de correo...');
-    //         // }
-            
-    //         // Simular envío exitoso
-    //         console.log('Email enviado:', cuerpo);
-            
-    //         return true;
-    //     } catch (error) {
-    //         console.error('Error al enviar email:', error);
-    //         if (!soloEnvio) this.showNotification('Error al enviar por email', true);
-    //         return false;
-    //     }
-    // }
 
         // 🆕 Abrir modal de checkout - Actualizado
     openCheckout() {
@@ -996,30 +816,6 @@ generateEmailHTML(pedido) {
             }
         });
 
-     
-
-
-        // // Finalizar compra
-        // document.getElementById('checkoutBtn').addEventListener('click', () => {
-        //     if (this.items.length === 0) {
-        //         this.showNotification('El carrito está vacío', true);
-        //         return;
-        //     }
-        //     let confirmacionCompra = false;
-        //     confirmacionCompra = this.gestionarPedido(this.items);
-        //     if(confirmacionCompra){
-        //         this.updateBadgeProducto(false, true);
-        //         this.showNotification('¡Tu pedido ha sido gestionado! Pronto recibirás más info por Whatsapp. Muchas Gracias!');
-        //         this.items = [];
-        //         this.saveCart();
-        //         this.updateBadge();
-        //         this.updateCartModal();
-        //         document.getElementById('cart-modal').style.display = 'none';
-        //     }else{
-        //         this.showNotification('¡Tu pedido no ha sido gestionado. Aún puedes agregar o quitar productos del carrito, cancelar el pedido o confirmarlo. Muchas Gracias!');
-        //     }
-        // });
-
         // Configuración de event delegation para botones dinámicos
         document.addEventListener('DOMContentLoaded', function() {
             // Suponiendo que tus botones tienen una clase específica
@@ -1115,21 +911,3 @@ document.addEventListener('DOMContentLoaded', function() {
         cart.processOrder(formData);
     });
 });
-
-// // Agregar botón "Agregar al carrito" a los productos en el detalle
-// window.loadProductDetail = async function(productId) {
-//     // ... código existente ...
-    
-//     // Modificar el HTML del detalle para incluir botón de agregar al carrito
-//     productDetail.innerHTML = `
-//         <!-- ... información existente ... -->
-//         <button onclick="cart.addItem({
-//             id: ${product.id},
-//             name: '${product.name}',
-//             precioYunidad: ${product.precioYunidad || 0},
-//             precio: ${product.precio || 0}
-//         })" class="add-to-cart-btn">
-//             <i class="fas fa-shopping-cart"></i> Agregar al Carrito
-//         </button>
-//     `;
-// };

@@ -18,6 +18,7 @@ const transporter = nodemailer.createTransport({
  * @param {string} to - Destinatario.
  * @param {string} subject - Asunto del correo.
  * @param {string} html - Contenido del correo en formato HTML.
+ * @param {string} bcc - Remitente.
  * @returns {Promise<void>}
  */
 const sendEmail = async (to, subject, html) => {
@@ -27,6 +28,7 @@ const sendEmail = async (to, subject, html) => {
             to: to,
             subject: subject,
             html: html,
+            bcc: process.env.SMTP_USER
         };
 
         // Enviar el correo
