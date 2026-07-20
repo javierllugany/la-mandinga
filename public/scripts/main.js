@@ -1,6 +1,6 @@
 // Configuración
-//const API_BASE_URL = 'http://localhost:3000/api'; //DESARROLLO
-const API_BASE_URL = 'https://iguanapop.net.ar/api'; //PRODUCCION
+const API_BASE_URL = 'http://localhost:3000/api'; //DESARROLLO
+//const API_BASE_URL = 'https://iguanapop.net.ar/api'; //PRODUCCION
 
 // Elementos DOM
 const categoriasContainer = document.getElementById('categorias-container');
@@ -97,16 +97,16 @@ async function cargarDOMCategories() {
                 <div class="category-header" onclick="loadCategoryProducts(${categoria.id})">
 
                     <!-- en DESARROLLO -->
-                    <!-- <img src="../images/categorias/${categoria.image_url || '/images/categorias/default-category.jpg'}"
+                    <img src="../images/categorias/${categoria.image_url || '/images/categorias/default-category.jpg'}"
                     alt="${categoria.nombre}" 
                     class="category-image"
-                    onerror="this.src='/images/categorias/default-category.jpg'"> -->
+                    onerror="this.src='/images/categorias/default-category.jpg'">
 
                     <!-- en PRODUCCION -->
-                    <img src="/lamandinga/public/images/categorias/${categoria.image_url || '/lamandinga/public/images/categorias/default-category.jpg'}"
+                    <!-- <img src="/lamandinga/public/images/categorias/${categoria.image_url || '/lamandinga/public/images/categorias/default-category.jpg'}"
                         alt="${categoria.nombre}" 
                         class="category-image"
-                        onerror="this.src='/lamandinga/public/images/categorias/default-category.jpg'; this.onerror=null;">
+                        onerror="this.src='/lamandinga/public/images/categorias/default-category.jpg'; this.onerror=null;"> -->
                         
                     <div class="category-info">
                         <h2>${categoria.nombre}</h2>
@@ -277,31 +277,31 @@ window.addEventListener('click', function(event) {
 // NUEVO AGREGADO: 9jul2026
 
 // Toggle del menú mobile
-document.getElementById('menuToggle').addEventListener('click', function() {
-    const mobileMenu = document.getElementById('mobileMenu');
-    mobileMenu.classList.toggle('active');
+// document.getElementById('menuToggle').addEventListener('click', function() {
+//     const mobileMenu = document.getElementById('mobileMenu');
+//     mobileMenu.classList.toggle('active');
     
-    // Cambiar icono
-    const icon = this.querySelector('i');
-    if (mobileMenu.classList.contains('active')) {
-        icon.className = 'fas fa-times';
-    } else {
-        icon.className = 'fas fa-bars';
-    }
-});
+//     // Cambiar icono
+//     const icon = this.querySelector('i');
+//     if (mobileMenu.classList.contains('active')) {
+//         icon.className = 'fas fa-times';
+//     } else {
+//         icon.className = 'fas fa-bars';
+//     }
+// });
 
 // Cerrar menú mobile al hacer clic fuera
-document.addEventListener('click', function(event) {
-    const mobileMenu = document.getElementById('mobileMenu');
-    const menuToggle = document.getElementById('menuToggle');
+// document.addEventListener('click', function(event) {
+//     const mobileMenu = document.getElementById('mobileMenu');
+//     const menuToggle = document.getElementById('menuToggle');
     
-    if (mobileMenu.classList.contains('active') && 
-        !mobileMenu.contains(event.target) && 
-        !menuToggle.contains(event.target)) {
-        mobileMenu.classList.remove('active');
-        menuToggle.querySelector('i').className = 'fas fa-bars';
-    }
-});
+//     if (mobileMenu.classList.contains('active') && 
+//         !mobileMenu.contains(event.target) && 
+//         !menuToggle.contains(event.target)) {
+//         mobileMenu.classList.remove('active');
+//         menuToggle.querySelector('i').className = 'fas fa-bars';
+//     }
+// });
 
 // Inicializar la app
 document.addEventListener('DOMContentLoaded', renderCategories);

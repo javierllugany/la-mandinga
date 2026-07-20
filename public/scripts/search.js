@@ -4,7 +4,7 @@ const productosContainerSearch = document.getElementById('productosSearch');
 class SearchHandler {
     constructor() {
         this.setupSearch();
-        this.setupMobileSearch();
+        // this.setupMobileSearch();
     }
 
     setupSearch() {
@@ -27,26 +27,26 @@ class SearchHandler {
         });
     }
 
-    setupMobileSearch() {
-        const searchForm = document.getElementById('mobileSearchForm');
-        const searchInput = document.getElementById('mobileSearchInput');
+    // setupMobileSearch() {
+    //     const searchForm = document.getElementById('mobileSearchForm');
+    //     const searchInput = document.getElementById('mobileSearchInput');
 
-        searchForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.performSearch(searchInput.value);
-            // Cerrar menú mobile
-            document.getElementById('mobileMenu').classList.remove('active');
-        });
+    //     searchForm.addEventListener('submit', (e) => {
+    //         e.preventDefault();
+    //         this.performSearch(searchInput.value);
+    //         // Cerrar menú mobile
+    //         document.getElementById('mobileMenu').classList.remove('active');
+    //     });
 
-        searchInput.addEventListener('input', (e) => {
-            productosContainerSearch.innerHTML = '';
-            if (e.target.value.length >= 2) {
-                this.performSearch(e.target.value);
-            } else if (e.target.value.length === 0) {
-                this.clearSearch();
-            }
-        });
-    }
+    //     searchInput.addEventListener('input', (e) => {
+    //         productosContainerSearch.innerHTML = '';
+    //         if (e.target.value.length >= 2) {
+    //             this.performSearch(e.target.value);
+    //         } else if (e.target.value.length === 0) {
+    //             this.clearSearch();
+    //         }
+    //     });
+    // }
 
     async performSearch(query) {
         try {

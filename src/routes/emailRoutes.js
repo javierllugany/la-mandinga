@@ -5,7 +5,7 @@ const sendEmail = require('../services/emailService');
 
 router.post('/email/send-order-email', async (req, res) => {
     try {
-        const { to, subject, html, text } = req.body;
+        const { to, subject, html} = req.body;
 
         if (!to || !subject || !html) {
             return res.status(400).json({
@@ -13,7 +13,7 @@ router.post('/email/send-order-email', async (req, res) => {
                 message: 'Faltan datos requeridos'
             });
         }
-        await sendEmail(to, subject, html, text);
+        await sendEmail(to, subject, html);
         res.json({
             success: true,
             message: 'Correo enviado exitosamente'

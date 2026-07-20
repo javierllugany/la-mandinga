@@ -10,10 +10,10 @@ class ContactHandler {
             document.getElementById('contact-modal').style.display = 'block';
         });
 
-        document.getElementById('mobileContactBtn').addEventListener('click', () => {
-            document.getElementById('mobileMenu').classList.remove('active');
-            document.getElementById('contact-modal').style.display = 'block';
-        });
+        // document.getElementById('mobileContactBtn').addEventListener('click', () => {
+        //     document.getElementById('mobileMenu').classList.remove('active');
+        //     document.getElementById('contact-modal').style.display = 'block';
+        // });
 
         // Cerrar modal de contacto
         document.getElementById('closeContact').addEventListener('click', () => {

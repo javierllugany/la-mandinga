@@ -213,10 +213,9 @@ class ShoppingCart {
             let envioExitoso = false;
             
             if (formData.metodoComunicacion === 'whatsapp') {
-                envioExitoso = await this.sendWhatsApp(pedido, true);
+                envioExitoso = await this.sendWhatsApp(pedido);
             } else {
-                // Intenta enviar el mail real
-                envioExitoso = await cart.sendEmail(pedido, true);
+                envioExitoso = await cart.sendEmail(pedido);
             }
 
             // Remover loading
@@ -257,7 +256,7 @@ class ShoppingCart {
     }
 
     // 🆕 Enviar por WhatsApp - Versión actualizada con retorno booleano
-    async sendWhatsApp(pedido, soloEnvio = false) {
+    async sendWhatsApp(pedido) {
         try {
             if (!pedido) {
                 this.showNotification('No hay pedido para enviar', true);
@@ -266,7 +265,7 @@ class ShoppingCart {
 
             // Formatear mensaje para WhatsApp
             let mensaje = `🌿 *LA MANDINGA - Productos Saludables*\n\n`;
-            mensaje += `*¡Gracias por tu pedido, ${pedido.cliente.nombre}*\n`;
+            mensaje += `*¡Gracias por tu pedido, ${pedido.cliente.nombre}!*\n`;
             mensaje += `Hemos recibido tu pedido correctamente.\n`;
             mensaje += `Aquí tienes los detalles:\n\n`;
             mensaje += `📋 *Número de Pedido:* #${String(pedido.id).padStart(8, '0')}\n`;
@@ -307,14 +306,14 @@ class ShoppingCart {
             // Abrir WhatsApp
             this.showNotification('Abriendo WhatsApp...');
             await window.open(`https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`, '_blank');
+            return true;
         } catch (error) {
             console.error('Error al enviar WhatsApp:', error);
-            if (!soloEnvio) this.showNotification('Error al enviar por WhatsApp', true);
             return false;
         }
     }
 
-    async sendEmail(pedido, soloEnvio = false) {
+    async sendEmail(pedido) {
     try {
         if (!pedido) {
             this.showNotification('No hay pedido para enviar', true);
@@ -338,20 +337,17 @@ class ShoppingCart {
 
         const result = await response.json();
 
-            if (!response.ok) {
+        if (!response.ok) {
             throw new Error(result.message || 'Error al enviar email');
         }
 
-        if (!soloEnvio) {
-            this.showNotification('✅ Correo enviado exitosamente');
-        }
+        this.showNotification('✅ Correo enviado exitosamente');
 
         console.log('Email enviado:', result);
         return true;
 
     } catch (error) {
         console.error('Error al enviar email:', error);
-        if (!soloEnvio) this.showNotification('Error al enviar por email', true);
         return false;
     }
 }
@@ -764,10 +760,10 @@ generateEmailHTML(pedido) {
     setupEventListeners() {
         // Abrir carrito
         document.getElementById('cartBtn').addEventListener('click', () => this.showCart());
-        document.getElementById('mobileCartBtn').addEventListener('click', () => {
-            document.getElementById('mobileMenu').classList.remove('active');
-            this.showCart();
-        });
+        // document.getElementById('mobileCartBtn').addEventListener('click', () => {
+        //     document.getElementById('mobileMenu').classList.remove('active');
+        //     this.showCart();
+        // });
 
         // Cerrar carrito
         document.getElementById('closeCart').addEventListener('click', () => {
@@ -800,7 +796,7 @@ generateEmailHTML(pedido) {
             e.preventDefault();
 
             const formData = {
-                nombre: document.getElementById('customerName').value,
+                nombre: document.getElementById('customerNameRetiro').value,
                 email: document.getElementById('customerEmail').value,
                 telefono: document.getElementById('customerPhone').value,
                 direccion: document.getElementById('customerAddress').value,

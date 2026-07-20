@@ -841,7 +841,7 @@ footer {
 }
 
 /* Menú hamburguesa */
-.menu-toggle {
+/* .menu-toggle {
     display: none;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -851,14 +851,14 @@ footer {
     cursor: pointer;
     font-size: 1.5rem;
     transition: all 0.3s ease;
-}
+} */
 
-.menu-toggle:hover {
+/* .menu-toggle:hover {
     background: rgba(255, 255, 255, 0.2);
-}
+} */
 
 /* Menú Mobile */
-.mobile-menu {
+/* .mobile-menu {
     display: none;
     background: rgba(45, 80, 22, 0.98);
     padding: 1rem 2rem;
@@ -868,9 +868,9 @@ footer {
 
 .mobile-menu.active {
     display: block;
-}
+} */
 
-@keyframes slideDown {
+/* @keyframes slideDown {
     from {
         opacity: 0;
         transform: translateY(-10px);
@@ -879,7 +879,7 @@ footer {
         opacity: 1;
         transform: translateY(0);
     }
-}
+} */
 
 .mobile-search {
     margin-bottom: 1rem;
@@ -1066,19 +1066,65 @@ footer {
 }
 
 @media (max-width: 768px) {
-    .search-container {
-        display: none;
-        order: 3;
-        flex-basis: 100%;
-        max-width: 100%;
+    .nav-container{
+        row-gap: 1rem;
+        display: grid;
+        grid-template-areas:
+            "logo email" 
+            "search cart ";
+        grid-template-columns: 80% 20%;
+        column-gap: 1px;
+        align-items: end;
     }
-    
+
+    .header-content{
+        grid-area: logo;
+    }
+
     .nav-actions {
-        display: none;
+        display: flex;
+        justify-content: end;
+    }
+
+    .nav-actions-contact {
+        grid-area: email;
+    }
+
+    .nav-actions-cart {
+        grid-area: cart;
+    }
+
+    .search-container {
+        max-width: 95%;
+        grid-area: search-start;
+    }
+
+    #searchResults{
+        padding: 0;
     }
     
-    .menu-toggle {
+    /* .nav-actions {
+        display: none;
+    } */
+    
+    /* .menu-toggle {
         display: block;
+    } */
+
+    .menu-toggle {
+    display: none;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+    }
+
+    .menu-toggle:hover {
+        background: rgba(255, 255, 255, 0.2);
     }
     
     .brand-link {
