@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const sendEmail = require('../services/emailService');
 
-router.post('/email/send-order-email', async (req, res) => {
+router.post('/send-order-email', async (req, res) => {
     try {
         const { to, subject, html} = req.body;
 

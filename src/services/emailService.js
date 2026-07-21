@@ -23,6 +23,10 @@ const transporter = nodemailer.createTransport({
  */
 const sendEmail = async (to, subject, html) => {
     try {
+        if (!transporter) {
+            throw new Error('transporter no configurado');
+        }
+
         const mailOptions = {
             from: `"La Mandinga" <${process.env.SMTP_USER}>`,
             to: to,
@@ -33,7 +37,7 @@ const sendEmail = async (to, subject, html) => {
 
         // Enviar el correo
         const info = await transporter.sendMail(mailOptions);
-        console.log(`✅ Correo enviado a ${to}: ${info.messageId}`);
+        //console.log(`✅ Correo enviado a ${to}: ${info.messageId}`);
         return info;
     } catch (error) {
         console.error(`❌ Error enviando correo a ${to}:`, error);

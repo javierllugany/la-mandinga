@@ -334,7 +334,6 @@ class ShoppingCart {
                 html: htmlBody,
             })
         });
-
         const result = await response.json();
 
         if (!response.ok) {
@@ -343,7 +342,6 @@ class ShoppingCart {
 
         this.showNotification('✅ Correo enviado exitosamente');
 
-        console.log('Email enviado:', result);
         return true;
 
     } catch (error) {
@@ -351,8 +349,6 @@ class ShoppingCart {
         return false;
     }
 }
-
-
 
     // Método para generar HTML del email
 generateEmailHTML(pedido) {
@@ -749,21 +745,11 @@ generateEmailHTML(pedido) {
             modal.style.display = 'none';
         }
     }
-          
-    //ESCRIBIR LOGICA DE LA COMPRA... Envia whatsapp con lista
-    // gestionarPedido(items){
-    //     console.log('Pedido Confirmado');
-    //     return true;
-    // }
 
     // Configurar event listeners
     setupEventListeners() {
         // Abrir carrito
         document.getElementById('cartBtn').addEventListener('click', () => this.showCart());
-        // document.getElementById('mobileCartBtn').addEventListener('click', () => {
-        //     document.getElementById('mobileMenu').classList.remove('active');
-        //     this.showCart();
-        // });
 
         // Cerrar carrito
         document.getElementById('closeCart').addEventListener('click', () => {
@@ -789,20 +775,6 @@ generateEmailHTML(pedido) {
         // 🆕 Cerrar confirmación con 'X'
         document.getElementById('closeConfirmation').addEventListener('click', () => {
             this.closeModal('confirmation-modal');
-        });
-
-        // 🆕 Procesar formulario de checkout
-        document.getElementById('checkoutForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const formData = {
-                nombre: document.getElementById('customerNameRetiro').value,
-                email: document.getElementById('customerEmail').value,
-                telefono: document.getElementById('customerPhone').value,
-                direccion: document.getElementById('customerAddress').value,
-            };
-
-            this.processOrder(formData);
         });
 
         // 🆕 Cerrar modales al hacer clic fuera
